@@ -25,12 +25,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.refreshAccessToken = exports.resetPassword = exports.forgotPassword = exports.getMe = exports.loginUser = exports.verifyEmail = exports.logoutUser = exports.registerUser = exports.activeUsers = void 0;
 const user_service_1 = require("./user.service");
-// import userService from "./user.service";
-// import { sendResponse } from "../../util/sendResponse";
-// import { User } from "./user.model";
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const expiry_stamp_1 = require("../../util/expiry-stamp");
 const config_1 = __importDefault(require("../../config"));
+const send_email_1 = require("../../util/send-email");
+const constant_1 = require("../../util/constant");
+const verify_email_html_1 = require("../../util/verify-email-html");
 const activeUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, user_service_1.getAllActiveUsers)();
@@ -59,11 +59,10 @@ const registerUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             isUsed: false,
         });
         const newLink = `${process.env.CLIENT_BASE_URL}/verify-email/${userToken.id}`; // Generate verification link
-        // await sendEmail(
-        //   email, // Recipient email
-        //   `Confirm your email address for ${APP_NAME}`, // Email subject
-        //   verificationEmailHTML(name, newLink) // HTML email content
-        // );
+        yield (0, send_email_1.sendEmail)(email, // Recipient email
+        `Confirm your email address for ${constant_1.APP_NAME}`, // Email subject
+        (0, verify_email_html_1.verificationEmailHTML)(name, newLink) // HTML email content
+        );
         res.status(201).json({ message: "User created successfully" }); // Send success response
     }
     catch (error) {
@@ -175,9 +174,6 @@ const getMe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         // Optionally remove sensitive fields before sending, like password
         const _a = user.toObject(), { password } = _a, safeUser = __rest(_a, ["password"]);
         res.status(200).json(safeUser);
-        // res.status(200).json({
-        //   message: "test message",
-        // });
     }
     catch (err) {
         next(err);

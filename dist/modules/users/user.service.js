@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateTokens = exports.updateUserToken = exports.verifyUserEmail = exports.findUserTokenById = exports.createUserToken = exports.findUserById = exports.findUserByEmail = exports.createUser = exports.getAllActiveUsers = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = __importDefault(require("../../config"));
+// import AppError from "../../errors/AppError";
+// import { sendVerificationEmail } from "../../util/emailService";
 const token_model_1 = require("./token.model");
 // import { BloodPost } from "../bloodPost/bloodPost.model";
 // import { DonorRequest } from "../donorRequest/donorRequest.model";
@@ -94,30 +96,13 @@ const updateUserToken = (tokenId, updateData) => __awaiter(void 0, void 0, void 
 exports.updateUserToken = updateUserToken;
 const generateTokens = (payload) => {
     // Generate Access Token (1 hour)
-    const accessToken = jsonwebtoken_1.default.sign(payload, config_1.default.jwt_access_secret, {
+    const accessToken = jsonwebtoken_1.default.sign(payload, config_1.default.jwt.access_secret, {
         expiresIn: "1h",
     });
     // Generate Refresh Token (7 days)
-    const refreshToken = jsonwebtoken_1.default.sign(payload, config_1.default.jwt_refresh_secret, {
+    const refreshToken = jsonwebtoken_1.default.sign(payload, config_1.default.jwt.refresh_secret, {
         expiresIn: "7d",
     });
     return { accessToken, refreshToken };
 };
 exports.generateTokens = generateTokens;
-// export default {
-//   // createUserRegistration,
-//   // updateUserRegistration,
-//   getAllActiveUsers,
-//   // getAllUsersWithDonationHistory,
-//   // getSingleUser,
-//   // getMyPost,
-//   // getMyDonationHistory,
-//   // getAllUsers,
-//   // makeConnection,
-//   // connectedUsers,
-//   // pointReduction,
-//   // getRequestedDonor,
-//   // changePassword,
-//   // verifyOtp,
-//   // resetPassword,
-// };

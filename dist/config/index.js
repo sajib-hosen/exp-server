@@ -8,12 +8,21 @@ const path_1 = __importDefault(require("path"));
 dotenv_1.default.config({ path: path_1.default.join(process.cwd(), ".env") });
 exports.default = {
     node_env: process.env.NODE_ENV,
-    port: process.env.PORT,
+    port: process.env.PORT || 5000,
     database_url: process.env.DATABASE_URL,
     bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS || "10",
-    jwt_access_secret: process.env.JWT_ACCESS_SECRET,
-    jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
-    email_user: process.env.EMAIL_USER,
-    email_pass: process.env.EMAIL_PASS,
+    jwt: {
+        access_secret: process.env.JWT_ACCESS_SECRET,
+        refresh_secret: process.env.JWT_REFRESH_SECRET,
+    },
     frontend_url: process.env.FRONTEND_URL,
+    smtp: {
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: process.env.SMTP_SECURE === "true", // convert to boolean
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+        from_name: process.env.SMTP_FROM_NAME,
+        from_email: process.env.SMTP_FROM_EMAIL,
+    },
 };
