@@ -16,7 +16,6 @@ exports.User = void 0;
 const mongoose_1 = require("mongoose");
 const config_1 = __importDefault(require("../../config"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-// type UserModel = Model<TUser, object>;
 const userSchema = new mongoose_1.Schema({
     name: {
         type: String,

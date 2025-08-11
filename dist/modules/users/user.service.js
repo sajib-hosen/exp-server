@@ -8,8 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyUserEmail = exports.findUserById = exports.findUserByEmail = exports.createUser = exports.getAllActiveUsers = void 0;
+exports.updateUserToken = exports.verifyUserEmail = exports.findUserTokenById = exports.createUserToken = exports.findUserById = exports.findUserByEmail = exports.createUser = exports.getAllActiveUsers = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
+const token_model_1 = require("./token.model");
 // import { BloodPost } from "../bloodPost/bloodPost.model";
 // import { DonorRequest } from "../donorRequest/donorRequest.model";
 // import { TUser } from "./user.interface";
@@ -63,32 +68,28 @@ const findUserById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return user_model_1.User.findById(id);
 });
 exports.findUserById = findUserById;
-// export const createUserToken = async (
-//   tokenData: Partial<IUserToken>
-// ): Promise<IUserToken> => {
-//   const userToken = new UserToken(tokenData);
-//   return userToken.save();
-// };
-// export const findUserTokenById = async (
-//   tokenId: string
-// ): Promise<IUserToken | null> => {
-//   if (!mongoose.Types.ObjectId.isValid(tokenId)) {
-//     return null;
-//   }
-//   return UserToken.findOne({ _id: tokenId });
-// };
+const createUserToken = (tokenData) => __awaiter(void 0, void 0, void 0, function* () {
+    const userToken = new token_model_1.UserToken(tokenData);
+    return userToken.save();
+});
+exports.createUserToken = createUserToken;
+const findUserTokenById = (tokenId) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!mongoose_1.default.Types.ObjectId.isValid(tokenId)) {
+        return null;
+    }
+    return token_model_1.UserToken.findOne({ _id: tokenId });
+});
+exports.findUserTokenById = findUserTokenById;
 const verifyUserEmail = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     return user_model_1.User.findByIdAndUpdate(userId, { isVerified: true }, { new: true });
 });
 exports.verifyUserEmail = verifyUserEmail;
-// export const updateUserToken = async (
-//   tokenId: string,
-//   updateData: Partial<IUserToken>
-// ): Promise<IUserToken | null> => {
-//   return UserToken.findByIdAndUpdate(tokenId, updateData, {
-//     new: true,
-//   });
-// };
+const updateUserToken = (tokenId, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    return token_model_1.UserToken.findByIdAndUpdate(tokenId, updateData, {
+        new: true,
+    });
+});
+exports.updateUserToken = updateUserToken;
 // export default {
 //   // createUserRegistration,
 //   // updateUserRegistration,

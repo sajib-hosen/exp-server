@@ -8,12 +8,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.refreshAccessToken = exports.resetPassword = exports.forgotPassword = exports.getMe = exports.loginUser = exports.verifyEmail = exports.logoutUser = exports.registerUser = exports.activeUsers = void 0;
 const user_service_1 = require("./user.service");
 // import userService from "./user.service";
 // import { sendResponse } from "../../util/sendResponse";
 // import { User } from "./user.model";
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const expiry_stamp_1 = require("../../util/expiry-stamp");
+const config_1 = __importDefault(require("../../config"));
 const activeUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, user_service_1.getAllActiveUsers)();
@@ -71,28 +88,28 @@ const logoutUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 exports.logoutUser = logoutUser;
 const verifyEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //     const { tokenId } = req.params;
-        //     const userToken = await findUserTokenById(tokenId);
-        //     if (!userToken) {
-        //       return res
-        //         .status(400)
-        //         .json({ message: "Invalid or expired verification link" });
-        //     }
-        //     if (userToken.isUsed || userToken.type !== "verify-email") {
-        //       return res.status(400).json({ message: "Invalid or already used token" });
-        //     }
-        //     //Find the user by email from token
-        //     const user = await findUserByEmail(userToken.email);
-        //     if (!user) {
-        //       return res.status(404).json({ message: "User not found" });
-        //     }
-        //     await verifyUserEmail(user.id);
-        //     await updateUserToken(userToken.id, { isUsed: true });
-        //     const { accessToken, refreshToken } = generateTokens({
-        //       id: user._id,
-        //       email: user.email,
-        //       role: user.role,
-        //     });
+        const { tokenId } = req.params;
+        const userToken = yield (0, user_service_1.findUserTokenById)(tokenId);
+        if (!userToken) {
+            return res
+                .status(400)
+                .json({ message: "Invalid or expired verification link" });
+        }
+        if (userToken.isUsed || userToken.type !== "verify-email") {
+            return res.status(400).json({ message: "Invalid or already used token" });
+        }
+        //Find the user by email from token
+        const user = yield (0, user_service_1.findUserByEmail)(userToken.email);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        yield (0, user_service_1.verifyUserEmail)(user.id);
+        yield (0, user_service_1.updateUserToken)(userToken.id, { isUsed: true });
+        // const { accessToken, refreshToken } = generateTokens({
+        //   id: user._id,
+        //   email: user.email,
+        //   role: user.role,
+        // });
         //     // Set refresh token as HTTP-only cookie
         //     res.cookie("refreshToken", refreshToken, {
         //       httpOnly: true, // Cannot be accessed via JavaScript
@@ -113,19 +130,18 @@ const verifyEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
 exports.verifyEmail = verifyEmail;
 const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //     const { email, password } = req.body; // Get credentials from request
-        //     const user = await findUserByEmail(email); // Find user in DB
-        //     if (!user || !password) {
-        //       return res.status(401).json({ message: "Invalid credentials" });
-        //     }
-        //     if (!user.isVerified)
-        //       return res.status(401).json({ message: "User not verified" });
-        //     // Validate password
-        //     const isPasswordValid =
-        //       user.password && (await bcrypt.compare(password, user.password));
-        //     if (!isPasswordValid) {
-        //       return res.status(401).json({ message: "Invalid credentials" });
-        //     }
+        const { email, password } = req.body; // Get credentials from request
+        const user = yield (0, user_service_1.findUserByEmail)(email); // Find user in DB
+        if (!user || !password) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+        if (!user.isVerified)
+            return res.status(401).json({ message: "User not verified" });
+        // Validate password
+        const isPasswordValid = user.password && (yield bcrypt_1.default.compare(password, user.password));
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
         //     const { accessToken, refreshToken } = generateTokens({
         //       id: user._id,
         //       email: user.email,
@@ -152,22 +168,22 @@ const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
 exports.loginUser = loginUser;
 const getMe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //     // Extract user id from req.user (set by your auth middleware)
-        //     const reqUser = (req as any).user as IUser;
-        //     if (!reqUser?.id) {
-        //       return res.status(401).json({ message: "Unauthorized" });
-        //     }
-        //     // Fetch fresh user data from DB by ID
-        //     const user = await findUserById(reqUser.id);
-        //     if (!user) {
-        //       return res.status(404).json({ message: "User not found" });
-        //     }
-        //     // Optionally remove sensitive fields before sending, like password
-        //     const { password, ...safeUser } = user.toObject();
-        //     res.status(200).json(safeUser);
-        res.status(200).json({
-            message: "test message",
-        });
+        // Extract user id from req.user (set by your auth middleware)
+        const reqUser = req.user;
+        if (!(reqUser === null || reqUser === void 0 ? void 0 : reqUser.id)) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        // Fetch fresh user data from DB by ID
+        const user = yield (0, user_service_1.findUserById)(reqUser.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        // Optionally remove sensitive fields before sending, like password
+        const _a = user.toObject(), { password } = _a, safeUser = __rest(_a, ["password"]);
+        res.status(200).json(safeUser);
+        // res.status(200).json({
+        //   message: "test message",
+        // });
     }
     catch (err) {
         next(err);
@@ -176,22 +192,22 @@ const getMe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
 exports.getMe = getMe;
 const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //     const { email } = req.body;
-        //     const user = await findUserByEmail(email);
-        //     if (!user) {
-        //       return res.status(200).json({
-        //         message: "If a matching account exists, a reset link has been sent.",
-        //       });
-        //     }
-        //     if (!user.isVerified)
-        //       return res.status(401).json({ message: "User not verified" });
-        //     const resetToken = await createUserToken({
-        //       type: "reset-password",
-        //       email,
-        //       isUsed: false,
-        //       expiresAt: EXPIRY_STAMP,
-        //     });
-        //     const resetLink = `${process.env.CLIENT_BASE_URL}/reset-password/${resetToken.id}`;
+        const { email } = req.body;
+        const user = yield (0, user_service_1.findUserByEmail)(email);
+        if (!user) {
+            return res.status(200).json({
+                message: "If a matching account exists, a reset link has been sent.",
+            });
+        }
+        if (!user.isVerified)
+            return res.status(401).json({ message: "User not verified" });
+        const resetToken = yield (0, user_service_1.createUserToken)({
+            type: "reset-password",
+            email,
+            isUsed: false,
+            expiresAt: expiry_stamp_1.EXPIRY_STAMP,
+        });
+        const resetLink = `${process.env.CLIENT_BASE_URL}/reset-password/${resetToken.id}`;
         //     await sendEmail(
         //       email,
         //       `Reset your password for ${APP_NAME}`,
@@ -208,21 +224,21 @@ const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.forgotPassword = forgotPassword;
 const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //     const { tokenId } = req.params;
-        //     const { newPassword } = req.body;
-        //     const userToken = await findUserTokenById(tokenId);
-        //     if (!userToken || userToken.isUsed || userToken.type !== "reset-password") {
-        //       return res
-        //         .status(400)
-        //         .json({ message: "Invalid or expired reset token." });
-        //     }
-        //     const user = await findUserByEmail(userToken.email);
-        //     if (!user) {
-        //       return res.status(404).json({ message: "User not found." });
-        //     }
-        //     const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUND);
-        //     await user.updateOne({ password: hashedPassword });
-        //     await updateUserToken(userToken.id, { isUsed: true });
+        const { tokenId } = req.params;
+        const { newPassword } = req.body;
+        const userToken = yield (0, user_service_1.findUserTokenById)(tokenId);
+        if (!userToken || userToken.isUsed || userToken.type !== "reset-password") {
+            return res
+                .status(400)
+                .json({ message: "Invalid or expired reset token." });
+        }
+        const user = yield (0, user_service_1.findUserByEmail)(userToken.email);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        const hashedPassword = yield bcrypt_1.default.hash(newPassword, Number(config_1.default.bcrypt_salt_rounds));
+        yield user.updateOne({ password: hashedPassword });
+        yield (0, user_service_1.updateUserToken)(userToken.id, { isUsed: true });
         res.status(200).json({ message: "Password has been reset successfully." });
     }
     catch (err) {
@@ -232,11 +248,11 @@ const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 exports.resetPassword = resetPassword;
 const refreshAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //     // The refreshTokenGuard middleware has verified the refresh token and attached user info to req.user
-        //     const user = (req as any).user;
-        //     if (!user) {
-        //       return res.status(401).json({ message: "Unauthorized" });
-        //     }
+        // The refreshTokenGuard middleware has verified the refresh token and attached user info to req.user
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
         //     // Generate new access and refresh tokens
         //     const { accessToken, refreshToken } = generateTokens({
         //       id: user.id,

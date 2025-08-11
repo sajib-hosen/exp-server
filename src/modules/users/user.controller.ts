@@ -1,8 +1,21 @@
 import { RequestHandler } from "express";
-import { createUser, findUserByEmail, getAllActiveUsers } from "./user.service";
+import {
+  createUser,
+  createUserToken,
+  findUserByEmail,
+  findUserById,
+  findUserTokenById,
+  getAllActiveUsers,
+  updateUserToken,
+  verifyUserEmail,
+} from "./user.service";
+import { IUser } from "./user.interface";
 // import userService from "./user.service";
 // import { sendResponse } from "../../util/sendResponse";
 // import { User } from "./user.model";
+import bcrypt from "bcrypt";
+import { EXPIRY_STAMP } from "../../util/expiry-stamp";
+import config from "../../config";
 
 export const activeUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -66,28 +79,32 @@ export const logoutUser: RequestHandler = async (req, res, next) => {
 
 export const verifyEmail: RequestHandler = async (req, res, next) => {
   try {
-    //     const { tokenId } = req.params;
-    //     const userToken = await findUserTokenById(tokenId);
-    //     if (!userToken) {
-    //       return res
-    //         .status(400)
-    //         .json({ message: "Invalid or expired verification link" });
-    //     }
-    //     if (userToken.isUsed || userToken.type !== "verify-email") {
-    //       return res.status(400).json({ message: "Invalid or already used token" });
-    //     }
-    //     //Find the user by email from token
-    //     const user = await findUserByEmail(userToken.email);
-    //     if (!user) {
-    //       return res.status(404).json({ message: "User not found" });
-    //     }
-    //     await verifyUserEmail(user.id);
-    //     await updateUserToken(userToken.id, { isUsed: true });
-    //     const { accessToken, refreshToken } = generateTokens({
-    //       id: user._id,
-    //       email: user.email,
-    //       role: user.role,
-    //     });
+    const { tokenId } = req.params;
+    const userToken = await findUserTokenById(tokenId);
+    if (!userToken) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired verification link" });
+    }
+
+    if (userToken.isUsed || userToken.type !== "verify-email") {
+      return res.status(400).json({ message: "Invalid or already used token" });
+    }
+    //Find the user by email from token
+    const user = await findUserByEmail(userToken.email);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    await verifyUserEmail(user.id);
+
+    await updateUserToken(userToken.id, { isUsed: true });
+
+    // const { accessToken, refreshToken } = generateTokens({
+    //   id: user._id,
+    //   email: user.email,
+    //   role: user.role,
+    // });
+
     //     // Set refresh token as HTTP-only cookie
     //     res.cookie("refreshToken", refreshToken, {
     //       httpOnly: true, // Cannot be accessed via JavaScript
@@ -107,19 +124,19 @@ export const verifyEmail: RequestHandler = async (req, res, next) => {
 
 export const loginUser: RequestHandler = async (req, res, next) => {
   try {
-    //     const { email, password } = req.body; // Get credentials from request
-    //     const user = await findUserByEmail(email); // Find user in DB
-    //     if (!user || !password) {
-    //       return res.status(401).json({ message: "Invalid credentials" });
-    //     }
-    //     if (!user.isVerified)
-    //       return res.status(401).json({ message: "User not verified" });
-    //     // Validate password
-    //     const isPasswordValid =
-    //       user.password && (await bcrypt.compare(password, user.password));
-    //     if (!isPasswordValid) {
-    //       return res.status(401).json({ message: "Invalid credentials" });
-    //     }
+    const { email, password } = req.body; // Get credentials from request
+    const user = await findUserByEmail(email); // Find user in DB
+    if (!user || !password) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    if (!user.isVerified)
+      return res.status(401).json({ message: "User not verified" });
+    // Validate password
+    const isPasswordValid =
+      user.password && (await bcrypt.compare(password, user.password));
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
     //     const { accessToken, refreshToken } = generateTokens({
     //       id: user._id,
     //       email: user.email,
@@ -145,22 +162,22 @@ export const loginUser: RequestHandler = async (req, res, next) => {
 
 export const getMe: RequestHandler = async (req, res, next) => {
   try {
-    //     // Extract user id from req.user (set by your auth middleware)
-    //     const reqUser = (req as any).user as IUser;
-    //     if (!reqUser?.id) {
-    //       return res.status(401).json({ message: "Unauthorized" });
-    //     }
-    //     // Fetch fresh user data from DB by ID
-    //     const user = await findUserById(reqUser.id);
-    //     if (!user) {
-    //       return res.status(404).json({ message: "User not found" });
-    //     }
-    //     // Optionally remove sensitive fields before sending, like password
-    //     const { password, ...safeUser } = user.toObject();
-    //     res.status(200).json(safeUser);
-    res.status(200).json({
-      message: "test message",
-    });
+    // Extract user id from req.user (set by your auth middleware)
+    const reqUser = (req as any).user as IUser;
+    if (!reqUser?.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    // Fetch fresh user data from DB by ID
+    const user = await findUserById(reqUser.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Optionally remove sensitive fields before sending, like password
+    const { password, ...safeUser } = user.toObject();
+    res.status(200).json(safeUser);
+    // res.status(200).json({
+    //   message: "test message",
+    // });
   } catch (err) {
     next(err);
   }
@@ -168,22 +185,23 @@ export const getMe: RequestHandler = async (req, res, next) => {
 
 export const forgotPassword: RequestHandler = async (req, res, next) => {
   try {
-    //     const { email } = req.body;
-    //     const user = await findUserByEmail(email);
-    //     if (!user) {
-    //       return res.status(200).json({
-    //         message: "If a matching account exists, a reset link has been sent.",
-    //       });
-    //     }
-    //     if (!user.isVerified)
-    //       return res.status(401).json({ message: "User not verified" });
-    //     const resetToken = await createUserToken({
-    //       type: "reset-password",
-    //       email,
-    //       isUsed: false,
-    //       expiresAt: EXPIRY_STAMP,
-    //     });
-    //     const resetLink = `${process.env.CLIENT_BASE_URL}/reset-password/${resetToken.id}`;
+    const { email } = req.body;
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res.status(200).json({
+        message: "If a matching account exists, a reset link has been sent.",
+      });
+    }
+    if (!user.isVerified)
+      return res.status(401).json({ message: "User not verified" });
+    const resetToken = await createUserToken({
+      type: "reset-password",
+      email,
+      isUsed: false,
+      expiresAt: EXPIRY_STAMP,
+    });
+    const resetLink = `${process.env.CLIENT_BASE_URL}/reset-password/${resetToken.id}`;
+
     //     await sendEmail(
     //       email,
     //       `Reset your password for ${APP_NAME}`,
@@ -199,21 +217,24 @@ export const forgotPassword: RequestHandler = async (req, res, next) => {
 
 export const resetPassword: RequestHandler = async (req, res, next) => {
   try {
-    //     const { tokenId } = req.params;
-    //     const { newPassword } = req.body;
-    //     const userToken = await findUserTokenById(tokenId);
-    //     if (!userToken || userToken.isUsed || userToken.type !== "reset-password") {
-    //       return res
-    //         .status(400)
-    //         .json({ message: "Invalid or expired reset token." });
-    //     }
-    //     const user = await findUserByEmail(userToken.email);
-    //     if (!user) {
-    //       return res.status(404).json({ message: "User not found." });
-    //     }
-    //     const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUND);
-    //     await user.updateOne({ password: hashedPassword });
-    //     await updateUserToken(userToken.id, { isUsed: true });
+    const { tokenId } = req.params;
+    const { newPassword } = req.body;
+    const userToken = await findUserTokenById(tokenId);
+    if (!userToken || userToken.isUsed || userToken.type !== "reset-password") {
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired reset token." });
+    }
+    const user = await findUserByEmail(userToken.email);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    const hashedPassword = await bcrypt.hash(
+      newPassword,
+      Number(config.bcrypt_salt_rounds)
+    );
+    await user.updateOne({ password: hashedPassword });
+    await updateUserToken(userToken.id, { isUsed: true });
     res.status(200).json({ message: "Password has been reset successfully." });
   } catch (err) {
     next(err);
@@ -222,11 +243,11 @@ export const resetPassword: RequestHandler = async (req, res, next) => {
 
 export const refreshAccessToken: RequestHandler = async (req, res, next) => {
   try {
-    //     // The refreshTokenGuard middleware has verified the refresh token and attached user info to req.user
-    //     const user = (req as any).user;
-    //     if (!user) {
-    //       return res.status(401).json({ message: "Unauthorized" });
-    //     }
+    // The refreshTokenGuard middleware has verified the refresh token and attached user info to req.user
+    const user = (req as any).user;
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     //     // Generate new access and refresh tokens
     //     const { accessToken, refreshToken } = generateTokens({
     //       id: user.id,

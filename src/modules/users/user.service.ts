@@ -1,7 +1,9 @@
+import mongoose from "mongoose";
 import config from "../../config";
 // import AppError from "../../errors/AppError";
 import { sendVerificationEmail } from "../../util/emailService";
-import { IUser } from "./user.interface";
+import { UserToken } from "./token.model";
+import { IUser, IUserToken } from "./user.interface";
 // import { BloodPost } from "../bloodPost/bloodPost.model";
 // import { DonorRequest } from "../donorRequest/donorRequest.model";
 // import { TUser } from "./user.interface";
@@ -65,22 +67,22 @@ export const findUserById = async (id: string) => {
   return User.findById(id);
 };
 
-// export const createUserToken = async (
-//   tokenData: Partial<IUserToken>
-// ): Promise<IUserToken> => {
-//   const userToken = new UserToken(tokenData);
-//   return userToken.save();
-// };
+export const createUserToken = async (
+  tokenData: Partial<IUserToken>
+): Promise<IUserToken> => {
+  const userToken = new UserToken(tokenData);
+  return userToken.save();
+};
 
-// export const findUserTokenById = async (
-//   tokenId: string
-// ): Promise<IUserToken | null> => {
-//   if (!mongoose.Types.ObjectId.isValid(tokenId)) {
-//     return null;
-//   }
+export const findUserTokenById = async (
+  tokenId: string
+): Promise<IUserToken | null> => {
+  if (!mongoose.Types.ObjectId.isValid(tokenId)) {
+    return null;
+  }
 
-//   return UserToken.findOne({ _id: tokenId });
-// };
+  return UserToken.findOne({ _id: tokenId });
+};
 
 export const verifyUserEmail = async (
   userId: string
@@ -88,14 +90,14 @@ export const verifyUserEmail = async (
   return User.findByIdAndUpdate(userId, { isVerified: true }, { new: true });
 };
 
-// export const updateUserToken = async (
-//   tokenId: string,
-//   updateData: Partial<IUserToken>
-// ): Promise<IUserToken | null> => {
-//   return UserToken.findByIdAndUpdate(tokenId, updateData, {
-//     new: true,
-//   });
-// };
+export const updateUserToken = async (
+  tokenId: string,
+  updateData: Partial<IUserToken>
+): Promise<IUserToken | null> => {
+  return UserToken.findByIdAndUpdate(tokenId, updateData, {
+    new: true,
+  });
+};
 
 // export default {
 //   // createUserRegistration,

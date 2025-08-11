@@ -3,8 +3,6 @@ import { IUser } from "./user.interface";
 import config from "../../config";
 import bcrypt from "bcrypt";
 
-// type UserModel = Model<TUser, object>;
-
 const userSchema = new Schema<IUser>(
   {
     name: {
