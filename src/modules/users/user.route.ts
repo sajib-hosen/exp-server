@@ -9,7 +9,7 @@ import {
   resetPassword,
   verifyEmail,
 } from "./user.controller";
-import auth from "../../middlewares/auth";
+import auth, { accessTokenGuard } from "../../middlewares/auth";
 
 const router = express.Router();
 
@@ -21,7 +21,7 @@ router.post("/verify-email/:tokenId", verifyEmail);
 
 router.post("/login", loginUser);
 
-router.get("/me", auth(), getMe);
+router.get("/me", accessTokenGuard, getMe);
 
 router.post("/forgot-password", forgotPassword);
 
