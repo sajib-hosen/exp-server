@@ -10,10 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logoutUser = exports.getCurrentStep = exports.submitQuizAnswers = void 0;
-const user_service_1 = require("../users/user.service");
-const send_email_1 = require("../../util/send-email");
-const constant_1 = require("../../util/constant");
-const verify_email_html_1 = require("../../util/verify-email-html");
 const quiz_service_1 = require("./quiz.service");
 const submitQuizAnswers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -93,23 +89,31 @@ const submitQuizAnswers = (req, res, next) => __awaiter(void 0, void 0, void 0, 
 exports.submitQuizAnswers = submitQuizAnswers;
 const getCurrentStep = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, email, password } = req.body;
-        const existingUser = yield (0, user_service_1.findUserByEmail)(email);
-        if (existingUser) {
-            return res.status(400).json({ message: "User already exists" });
+        const user = req.user;
+        if (!(user === null || user === void 0 ? void 0 : user.id) && !(user === null || user === void 0 ? void 0 : user.email)) {
+            return res.status(400).json({ message: "Invalid user" });
         }
-        yield (0, user_service_1.createUser)({ name, email, password }); // Create new user in the database
-        const userToken = yield (0, user_service_1.createUserToken)({
-            type: "verify-email",
-            email,
-            isUsed: false,
+        const previousResult = yield (0, quiz_service_1.getQuizResult)({
+            userId: user.id,
+            email: user.email,
         });
-        const newLink = `${process.env.CLIENT_BASE_URL}/verify-email/${userToken.id}`; // Generate verification link
-        yield (0, send_email_1.sendEmail)(email, // Recipient email
-        `Confirm your email address for ${constant_1.APP_NAME}`, // Email subject
-        (0, verify_email_html_1.verificationEmailHTML)(name, newLink) // HTML email content
-        );
-        res.status(201).json({ message: "User created successfully" }); // Send success response
+        if (!previousResult) {
+            // No previous result, start at step 1 and eligible
+            return res.status(200).json({
+                currentStep: 1,
+                eligibleToQuiz: true,
+                certification: null,
+            });
+        }
+        const currentStep = previousResult.proceedToNextStep && previousResult.step < 3
+            ? previousResult.step + 1
+            : previousResult.step;
+        const eligibleToQuiz = currentStep > previousResult.step || previousResult.step !== currentStep;
+        return res.status(200).json({
+            currentStep,
+            eligibleToQuiz,
+            certification: previousResult.certification,
+        });
     }
     catch (error) {
         console.log("register error", error);
