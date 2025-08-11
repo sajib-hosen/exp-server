@@ -41,3 +41,11 @@ export interface UpdateResultInput {
   proceedToNextStep: boolean;
   scorePercent: number;
 }
+
+export type Step = 1 | 2 | 3;
+
+export interface Result {
+  scorePercent: number;
+  certification: string;
+  proceedToNextStep: boolean;
+}
