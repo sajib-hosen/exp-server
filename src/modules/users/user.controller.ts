@@ -4,23 +4,6 @@ import { createUser, findUserByEmail, getAllActiveUsers } from "./user.service";
 // import { sendResponse } from "../../util/sendResponse";
 // import { User } from "./user.model";
 
-// const createUser: RequestHandler = async (req, res, next) => {
-//   try {
-//     const { user } = req.body;
-//     //console.log("user from controller", user);
-//     const result = await userService.createUserRegistration(user);
-
-//     res.status(200).json({
-//       success: true,
-//       message: "User is registration request received successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     console.log("createUser Controller", err);
-//     next(err);
-//   }
-// };
-
 export const activeUsers: RequestHandler = async (req, res, next) => {
   try {
     const result = await getAllActiveUsers();
@@ -81,237 +64,188 @@ export const logoutUser: RequestHandler = async (req, res, next) => {
   }
 };
 
-// const allUsers: RequestHandler = async (req, res, next) => {
-//   try {
-//     const result = await userService.getAllUsers(req?.user?.name);
+export const verifyEmail: RequestHandler = async (req, res, next) => {
+  try {
+    //     const { tokenId } = req.params;
+    //     const userToken = await findUserTokenById(tokenId);
+    //     if (!userToken) {
+    //       return res
+    //         .status(400)
+    //         .json({ message: "Invalid or expired verification link" });
+    //     }
+    //     if (userToken.isUsed || userToken.type !== "verify-email") {
+    //       return res.status(400).json({ message: "Invalid or already used token" });
+    //     }
+    //     //Find the user by email from token
+    //     const user = await findUserByEmail(userToken.email);
+    //     if (!user) {
+    //       return res.status(404).json({ message: "User not found" });
+    //     }
+    //     await verifyUserEmail(user.id);
+    //     await updateUserToken(userToken.id, { isUsed: true });
+    //     const { accessToken, refreshToken } = generateTokens({
+    //       id: user._id,
+    //       email: user.email,
+    //       role: user.role,
+    //     });
+    //     // Set refresh token as HTTP-only cookie
+    //     res.cookie("refreshToken", refreshToken, {
+    //       httpOnly: true, // Cannot be accessed via JavaScript
+    //       secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+    //       sameSite: "strict", // CSRF protection
+    //       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    //       path: "/",
+    //     });
+    //     res.status(200).json({ accessToken });
+    res.status(200).json({
+      message: "test message",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-//     res.status(200).json({
-//       success: true,
-//       message: "Retrieved all users",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+export const loginUser: RequestHandler = async (req, res, next) => {
+  try {
+    //     const { email, password } = req.body; // Get credentials from request
+    //     const user = await findUserByEmail(email); // Find user in DB
+    //     if (!user || !password) {
+    //       return res.status(401).json({ message: "Invalid credentials" });
+    //     }
+    //     if (!user.isVerified)
+    //       return res.status(401).json({ message: "User not verified" });
+    //     // Validate password
+    //     const isPasswordValid =
+    //       user.password && (await bcrypt.compare(password, user.password));
+    //     if (!isPasswordValid) {
+    //       return res.status(401).json({ message: "Invalid credentials" });
+    //     }
+    //     const { accessToken, refreshToken } = generateTokens({
+    //       id: user._id,
+    //       email: user.email,
+    //       role: user.role,
+    //     });
+    //     // Set refresh token as HTTP-only cookie
+    //     res.cookie("refreshToken", refreshToken, {
+    //       httpOnly: true, // Cannot be accessed via JavaScript
+    //       secure: process.env.NODE_ENV === "production", // HTTPS in production
+    //       sameSite: "strict", // CSRF protection
+    //       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    //       path: "/",
+    //     });
+    //     // Send access token to client
+    //     res.status(200).json({ accessToken });
+    res.status(200).json({
+      message: "test message",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-// const usersWithDonationHistory: RequestHandler = async (req, res, next) => {
-//   try {
-//     const result = await userService.getAllUsersWithDonationHistory();
+export const getMe: RequestHandler = async (req, res, next) => {
+  try {
+    //     // Extract user id from req.user (set by your auth middleware)
+    //     const reqUser = (req as any).user as IUser;
+    //     if (!reqUser?.id) {
+    //       return res.status(401).json({ message: "Unauthorized" });
+    //     }
+    //     // Fetch fresh user data from DB by ID
+    //     const user = await findUserById(reqUser.id);
+    //     if (!user) {
+    //       return res.status(404).json({ message: "User not found" });
+    //     }
+    //     // Optionally remove sensitive fields before sending, like password
+    //     const { password, ...safeUser } = user.toObject();
+    //     res.status(200).json(safeUser);
+    res.status(200).json({
+      message: "test message",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-//     res.status(200).json({
-//       success: true,
-//       message: "Retrieved all users with respective donation history",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+export const forgotPassword: RequestHandler = async (req, res, next) => {
+  try {
+    //     const { email } = req.body;
+    //     const user = await findUserByEmail(email);
+    //     if (!user) {
+    //       return res.status(200).json({
+    //         message: "If a matching account exists, a reset link has been sent.",
+    //       });
+    //     }
+    //     if (!user.isVerified)
+    //       return res.status(401).json({ message: "User not verified" });
+    //     const resetToken = await createUserToken({
+    //       type: "reset-password",
+    //       email,
+    //       isUsed: false,
+    //       expiresAt: EXPIRY_STAMP,
+    //     });
+    //     const resetLink = `${process.env.CLIENT_BASE_URL}/reset-password/${resetToken.id}`;
+    //     await sendEmail(
+    //       email,
+    //       `Reset your password for ${APP_NAME}`,
+    //       resetPasswordEmailHTML(user.name, resetLink)
+    //     );
+    res.status(200).json({
+      message: "If a matching account exists, a reset link has been sent.",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-// const getSingleUser: RequestHandler = async (req, res, next) => {
-//   const { name } = req.params;
-//   try {
-//     const result = await userService.getSingleUser(name as string);
+export const resetPassword: RequestHandler = async (req, res, next) => {
+  try {
+    //     const { tokenId } = req.params;
+    //     const { newPassword } = req.body;
+    //     const userToken = await findUserTokenById(tokenId);
+    //     if (!userToken || userToken.isUsed || userToken.type !== "reset-password") {
+    //       return res
+    //         .status(400)
+    //         .json({ message: "Invalid or expired reset token." });
+    //     }
+    //     const user = await findUserByEmail(userToken.email);
+    //     if (!user) {
+    //       return res.status(404).json({ message: "User not found." });
+    //     }
+    //     const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUND);
+    //     await user.updateOne({ password: hashedPassword });
+    //     await updateUserToken(userToken.id, { isUsed: true });
+    res.status(200).json({ message: "Password has been reset successfully." });
+  } catch (err) {
+    next(err);
+  }
+};
 
-//     res.status(200).json({
-//       success: true,
-//       message: "Retrieved single user successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const updateUser: RequestHandler = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     const result = await userService.updateUserRegistration(id, req.body);
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "User profile is updated successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const getMyPost: RequestHandler = async (req, res, next) => {
-//   try {
-//     const result = await userService.getMyPost(req?.user?.name);
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "My posts are retrieved successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const getRequestedDonor: RequestHandler = async (req, res, next) => {
-//   const { id } = req.params;
-//   try {
-//     const result = await userService.getRequestedDonor(id);
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "Requested donors are retrieved successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const getMyDonationHistory: RequestHandler = async (req, res, next) => {
-//   try {
-//     const result = await userService.getMyDonationHistory(req?.user?.name);
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "My donation history are retrieved successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const makeConnection: RequestHandler = async (req, res, next) => {
-//   //console.log("cc", req.params);
-//   const { id } = req?.params;
-//   try {
-//     const result = await userService.makeConnection({
-//       id,
-//       name: req?.user?.name,
-//     });
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "Connection created successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const makingConnection: RequestHandler = async (req, res, next) => {
-//   //console.log("cc", req.body);
-//   try {
-//     const result = await userService.makeConnection({
-//       id: req?.body,
-//       name: req?.user?.name,
-//     });
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "Connection created successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const connectedUsers: RequestHandler = async (req, res, next) => {
-//   try {
-//     const result = await userService.connectedUsers(req?.user?.name);
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "Connected users are retrieved successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const pointReduction: RequestHandler = async (req, res, next) => {
-//   try {
-//     const { postId, userId } = req.body;
-//     const result = await userService.pointReduction(
-//       req?.params?.name,
-//       postId,
-//       userId
-//     );
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "User point reduced successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const changePassword: RequestHandler = async (req, res, next) => {
-//   try {
-//     const result = await userService.changePassword(req.user.name);
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "OTP sent to email",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const verifyOtp: RequestHandler = async (req, res, next) => {
-//   try {
-//     const { otp } = req.query;
-//     const result = await userService.verifyOtp(req.user.name, otp as string);
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "OTP verified",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const resetPassword: RequestHandler = async (req, res, next) => {
-//   try {
-//     const { otp, password } = req.body;
-//     const result = await userService.resetPassword(
-//       req.user.name,
-//       otp,
-//       password
-//     );
-
-//     sendResponse(res, {
-//       success: true,
-//       message: "Password reset successfully",
-//       data: result,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const updateLastSeen: RequestHandler = async (req, res, next) => {
-//   try {
-//     await User.findByIdAndUpdate(req.user.id, {
-//       lastSeenAt: new Date(),
-//     });
-
-//     sendResponse(res, {
-//       success: true,
-//       message: null,
-//       data: null,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+export const refreshAccessToken: RequestHandler = async (req, res, next) => {
+  try {
+    //     // The refreshTokenGuard middleware has verified the refresh token and attached user info to req.user
+    //     const user = (req as any).user;
+    //     if (!user) {
+    //       return res.status(401).json({ message: "Unauthorized" });
+    //     }
+    //     // Generate new access and refresh tokens
+    //     const { accessToken, refreshToken } = generateTokens({
+    //       id: user.id,
+    //       email: user.email,
+    //       role: user.role,
+    //     });
+    //     // Set new refresh token cookie
+    //     res.cookie("refreshToken", refreshToken, {
+    //       httpOnly: true,
+    //       secure: process.env.NODE_ENV === "production",
+    //       sameSite: "strict",
+    //       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    //     });
+    //     // Send new access token in response
+    //     res.status(200).json({ accessToken });
+    res.status(200).json({
+      message: "test message",
+    });
+  } catch (err) {
+    next(err);
+  }
+};

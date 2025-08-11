@@ -10,12 +10,12 @@ const user_controller_1 = require("./user.controller");
 // import auth from "../../middlewares/auth";
 const router = express_1.default.Router();
 router.get("/active-users", user_controller_1.activeUsers);
-// router.post("/register", asyncHandler(registerUser));
-// router.post("/verify-email/:tokenId", asyncHandler(verifyEmail));
-// router.post("/login", asyncHandler(loginUser));
+router.post("/register", user_controller_1.registerUser);
+router.post("/verify-email/:tokenId", user_controller_1.verifyEmail);
+router.post("/login", user_controller_1.loginUser);
 // router.get("/me", asyncHandler(accessTokenGuard), asyncHandler(getMe));
-// router.post("/forgot-password", asyncHandler(forgotPassword));
-// router.post("/reset-password/:tokenId", asyncHandler(resetPassword));
+router.post("/forgot-password", user_controller_1.forgotPassword);
+router.post("/reset-password/:tokenId", user_controller_1.resetPassword);
 // router.get(
 //   "/refresh-token",
 //   asyncHandler(refreshTokenGuard),
