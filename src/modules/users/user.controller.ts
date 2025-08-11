@@ -11,12 +11,12 @@ import {
   verifyUserEmail,
 } from "./user.service";
 import { IUser } from "./user.interface";
-// import userService from "./user.service";
-// import { sendResponse } from "../../util/sendResponse";
-// import { User } from "./user.model";
 import bcrypt from "bcrypt";
 import { EXPIRY_STAMP } from "../../util/expiry-stamp";
 import config from "../../config";
+import { sendEmail } from "../../util/send-email";
+import { APP_NAME } from "../../util/constant";
+import { verificationEmailHTML } from "../../util/verify-email-html";
 
 export const activeUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -51,11 +51,11 @@ export const registerUser: RequestHandler = async (req, res, next) => {
 
     const newLink = `${process.env.CLIENT_BASE_URL}/verify-email/${userToken.id}`; // Generate verification link
 
-    // await sendEmail(
-    //   email, // Recipient email
-    //   `Confirm your email address for ${APP_NAME}`, // Email subject
-    //   verificationEmailHTML(name, newLink) // HTML email content
-    // );
+    await sendEmail(
+      email, // Recipient email
+      `Confirm your email address for ${APP_NAME}`, // Email subject
+      verificationEmailHTML(name, newLink) // HTML email content
+    );
 
     res.status(201).json({ message: "User created successfully" }); // Send success response
   } catch (error) {
@@ -170,9 +170,6 @@ export const getMe: RequestHandler = async (req, res, next) => {
     // Optionally remove sensitive fields before sending, like password
     const { password, ...safeUser } = user.toObject();
     res.status(200).json(safeUser);
-    // res.status(200).json({
-    //   message: "test message",
-    // });
   } catch (err) {
     next(err);
   }

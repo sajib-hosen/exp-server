@@ -1,4 +1,5 @@
-// import nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
+import config from "../config";
 
 // /**
 //  * Sends an email using Nodemailer.
@@ -7,37 +8,25 @@
 //  * @param subject - The subject of the email.
 //  * @param html - The HTML content of the email.
 //  */
-// export const sendEmail = async (
-//   to: string,
-//   subject: string,
-//   html: string
-// ): Promise<void> => {
-//   try {
-//     const transporter = nodemailer.createTransport({
-//       host: process.env.SMTP_HOST,
-//       port: Number(process.env.SMTP_PORT) || 587,
-//       secure: process.env.SMTP_SECURE === "true",
-//       auth: {
-//         user: process.env.SMTP_USER,
-//         pass: process.env.SMTP_PASS,
-//       },
-//     });
+export const sendEmail = async (to: string, subject: string, html: string) => {
+  const transporter = nodemailer.createTransport({
+    host: config.smtp.host,
+    port: Number(config.smtp.port) || 587,
+    secure: config.smtp.secure,
+    auth: {
+      user: config.smtp.user,
+      pass: config.smtp.pass,
+    },
+  });
 
-//     /**
-//      * Send the email using the transporter.
-//      * The 'from' field combines a display name and an email address.
-//      */
-//     await transporter.sendMail({
-//       from: `"${process.env.SMTP_FROM_NAME}" <${process.env.SMTP_FROM_EMAIL}>`,
-//       to,
-//       subject,
-//       html,
-//     });
-
-//     console.log(`📧 Email sent to ${to}`);
-//   } catch (error) {
-//     // Log and rethrow any errors that occur during email sending
-//     console.error("❌ Email sending failed:", error);
-//     throw error;
-//   }
-// };
+  /**
+   * Send the email using the transporter.
+   * The 'from' field combines a display name and an email address.
+   */
+  await transporter.sendMail({
+    from: `"${config.smtp.from_name}" <${config.smtp.from_email}>`,
+    to,
+    subject,
+    html,
+  });
+};
