@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
-import userService from "./user.service";
+import { createUser, findUserByEmail, getAllActiveUsers } from "./user.service";
+// import userService from "./user.service";
 // import { sendResponse } from "../../util/sendResponse";
 // import { User } from "./user.model";
 
@@ -22,7 +23,7 @@ import userService from "./user.service";
 
 export const activeUsers: RequestHandler = async (req, res, next) => {
   try {
-    const result = await userService.getAllActiveUsers();
+    const result = await getAllActiveUsers();
 
     res.status(200).json({
       success: true,
@@ -38,12 +39,12 @@ export const registerUser: RequestHandler = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
-    // const existingUser = await findUserByEmail(email);
-    // if (existingUser) {
-    //   return res.status(400).json({ message: "User already exists" });
-    // }
+    const existingUser = await findUserByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
-    // await createUser({ name, email, password }); // Create new user in the database
+    await createUser({ name, email, password }); // Create new user in the database
 
     // const userToken = await createUserToken({
     //   type: "verify-email",
