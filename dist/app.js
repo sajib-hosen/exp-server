@@ -13,7 +13,10 @@ const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const AppError_1 = __importDefault(require("./errors/AppError"));
 const config_1 = __importDefault(require("./config"));
 const app = (0, express_1.default)();
-const cors_sites = [config_1.default.frontend_url];
+const cors_sites = [
+    config_1.default.frontend_url,
+    "https://school-test-one.vercel.app",
+];
 app.use((0, cors_1.default)({
     origin: cors_sites,
     credentials: true,
