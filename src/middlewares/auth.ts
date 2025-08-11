@@ -54,7 +54,7 @@ export async function accessTokenGuard(
     try {
       const decoded = jwt.verify(
         token,
-        process.env.JWT_SECRET as string
+        config.jwt.access_secret as string
       ) as JwtPayload;
 
       if (!decoded?.id) {
