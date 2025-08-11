@@ -5,11 +5,12 @@ import {
   getMe,
   loginUser,
   logoutUser,
+  refreshAccessToken,
   registerUser,
   resetPassword,
   verifyEmail,
 } from "./user.controller";
-import auth, { accessTokenGuard } from "../../middlewares/auth";
+import { accessTokenGuard, refreshTokenGuard } from "../../middlewares/auth";
 
 const router = express.Router();
 
@@ -27,11 +28,7 @@ router.post("/forgot-password", forgotPassword);
 
 router.post("/reset-password/:tokenId", resetPassword);
 
-// router.get(
-//   "/refresh-token",
-//   asyncHandler(refreshTokenGuard),
-//   asyncHandler(refreshAccessToken)
-// );
+router.get("/refresh-token", refreshTokenGuard, refreshAccessToken);
 
 router.post("/logout", logoutUser);
 
