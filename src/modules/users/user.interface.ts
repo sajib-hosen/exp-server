@@ -1,22 +1,11 @@
-import { Types } from "mongoose";
+import { Document } from "mongoose";
 
-export type TUser = {
+export interface IUser extends Document {
   name: string;
   email: string;
-  password: string;
+  password?: string;
+  role: "student" | "admin" | "supervisor";
+  createdAt: Date;
+  updatedAt: Date;
   isVerified: boolean;
-  age: number;
-  district: string;
-  lastDonationDate: string;
-  donationAvailability: boolean;
-  bloodGroup: string;
-  points: number;
-  refreshToken: string | null;
-  otp: number | null;
-  otpExpiresAt: Date | null;
-  lastSeenAt: Date;
-  donationHistory: [Types.ObjectId];
-  postHistory: [Types.ObjectId];
-  cancelHistory: [Types.ObjectId];
-  friends: [Types.ObjectId];
-};
+}
