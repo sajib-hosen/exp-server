@@ -5,6 +5,7 @@ import {
   findUserByEmail,
   findUserById,
   findUserTokenById,
+  generateTokens,
   getAllActiveUsers,
   updateUserToken,
   verifyUserEmail,
@@ -42,13 +43,13 @@ export const registerUser: RequestHandler = async (req, res, next) => {
 
     await createUser({ name, email, password }); // Create new user in the database
 
-    // const userToken = await createUserToken({
-    //   type: "verify-email",
-    //   email,
-    //   isUsed: false,
-    // });
+    const userToken = await createUserToken({
+      type: "verify-email",
+      email,
+      isUsed: false,
+    });
 
-    // const newLink = `${process.env.CLIENT_BASE_URL}/verify-email/${userToken.id}`; // Generate verification link
+    const newLink = `${process.env.CLIENT_BASE_URL}/verify-email/${userToken.id}`; // Generate verification link
 
     // await sendEmail(
     //   email, // Recipient email
@@ -99,24 +100,21 @@ export const verifyEmail: RequestHandler = async (req, res, next) => {
 
     await updateUserToken(userToken.id, { isUsed: true });
 
-    // const { accessToken, refreshToken } = generateTokens({
-    //   id: user._id,
-    //   email: user.email,
-    //   role: user.role,
-    // });
-
-    //     // Set refresh token as HTTP-only cookie
-    //     res.cookie("refreshToken", refreshToken, {
-    //       httpOnly: true, // Cannot be accessed via JavaScript
-    //       secure: process.env.NODE_ENV === "production", // Use HTTPS in production
-    //       sameSite: "strict", // CSRF protection
-    //       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    //       path: "/",
-    //     });
-    //     res.status(200).json({ accessToken });
-    res.status(200).json({
-      message: "test message",
+    const { accessToken, refreshToken } = generateTokens({
+      id: user._id,
+      email: user.email,
+      role: user.role,
     });
+
+    // Set refresh token as HTTP-only cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true, // Cannot be accessed via JavaScript
+      secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+      sameSite: "strict", // CSRF protection
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/",
+    });
+    res.status(200).json({ accessToken });
   } catch (err) {
     next(err);
   }
@@ -137,24 +135,21 @@ export const loginUser: RequestHandler = async (req, res, next) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    //     const { accessToken, refreshToken } = generateTokens({
-    //       id: user._id,
-    //       email: user.email,
-    //       role: user.role,
-    //     });
-    //     // Set refresh token as HTTP-only cookie
-    //     res.cookie("refreshToken", refreshToken, {
-    //       httpOnly: true, // Cannot be accessed via JavaScript
-    //       secure: process.env.NODE_ENV === "production", // HTTPS in production
-    //       sameSite: "strict", // CSRF protection
-    //       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    //       path: "/",
-    //     });
-    //     // Send access token to client
-    //     res.status(200).json({ accessToken });
-    res.status(200).json({
-      message: "test message",
+    const { accessToken, refreshToken } = generateTokens({
+      id: user._id,
+      email: user.email,
+      role: user.role,
     });
+    //     // Set refresh token as HTTP-only cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true, // Cannot be accessed via JavaScript
+      secure: process.env.NODE_ENV === "production", // HTTPS in production
+      sameSite: "strict", // CSRF protection
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/",
+    });
+    //     // Send access token to client
+    res.status(200).json({ accessToken });
   } catch (err) {
     next(err);
   }
@@ -249,23 +244,20 @@ export const refreshAccessToken: RequestHandler = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     //     // Generate new access and refresh tokens
-    //     const { accessToken, refreshToken } = generateTokens({
-    //       id: user.id,
-    //       email: user.email,
-    //       role: user.role,
-    //     });
-    //     // Set new refresh token cookie
-    //     res.cookie("refreshToken", refreshToken, {
-    //       httpOnly: true,
-    //       secure: process.env.NODE_ENV === "production",
-    //       sameSite: "strict",
-    //       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    //     });
-    //     // Send new access token in response
-    //     res.status(200).json({ accessToken });
-    res.status(200).json({
-      message: "test message",
+    const { accessToken, refreshToken } = generateTokens({
+      id: user.id,
+      email: user.email,
+      role: user.role,
     });
+    // Set new refresh token cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+    // Send new access token in response
+    res.status(200).json({ accessToken });
   } catch (err) {
     next(err);
   }

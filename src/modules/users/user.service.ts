@@ -99,6 +99,20 @@ export const updateUserToken = async (
   });
 };
 
+export const generateTokens = (payload: object) => {
+  // Generate Access Token (1 hour)
+  const accessToken = jwt.sign(payload, config.jwt_access_secret as string, {
+    expiresIn: "1h",
+  });
+
+  // Generate Refresh Token (7 days)
+  const refreshToken = jwt.sign(payload, config.jwt_refresh_secret as string, {
+    expiresIn: "7d",
+  });
+
+  return { accessToken, refreshToken };
+};
+
 // export default {
 //   // createUserRegistration,
 //   // updateUserRegistration,

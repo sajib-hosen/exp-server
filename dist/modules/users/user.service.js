@@ -12,13 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserToken = exports.verifyUserEmail = exports.findUserTokenById = exports.createUserToken = exports.findUserById = exports.findUserByEmail = exports.createUser = exports.getAllActiveUsers = void 0;
+exports.generateTokens = exports.updateUserToken = exports.verifyUserEmail = exports.findUserTokenById = exports.createUserToken = exports.findUserById = exports.findUserByEmail = exports.createUser = exports.getAllActiveUsers = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
+const config_1 = __importDefault(require("../../config"));
 const token_model_1 = require("./token.model");
 // import { BloodPost } from "../bloodPost/bloodPost.model";
 // import { DonorRequest } from "../donorRequest/donorRequest.model";
 // import { TUser } from "./user.interface";
 const user_model_1 = require("./user.model");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // import bcrypt from "bcrypt";
 // const createUserRegistration = async (payload: TUser) => {
 //   const isUserAlreadyExist = await User.findOne({ name: payload.name });
@@ -90,6 +92,18 @@ const updateUserToken = (tokenId, updateData) => __awaiter(void 0, void 0, void 
     });
 });
 exports.updateUserToken = updateUserToken;
+const generateTokens = (payload) => {
+    // Generate Access Token (1 hour)
+    const accessToken = jsonwebtoken_1.default.sign(payload, config_1.default.jwt_access_secret, {
+        expiresIn: "1h",
+    });
+    // Generate Refresh Token (7 days)
+    const refreshToken = jsonwebtoken_1.default.sign(payload, config_1.default.jwt_refresh_secret, {
+        expiresIn: "7d",
+    });
+    return { accessToken, refreshToken };
+};
+exports.generateTokens = generateTokens;
 // export default {
 //   // createUserRegistration,
 //   // updateUserRegistration,
