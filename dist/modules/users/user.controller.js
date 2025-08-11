@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.logoutUser = exports.registerUser = exports.activeUsers = void 0;
 const user_service_1 = __importDefault(require("./user.service"));
 // import { sendResponse } from "../../util/sendResponse";
 // import { User } from "./user.model";
@@ -43,6 +44,48 @@ const activeUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         next(err);
     }
 });
+exports.activeUsers = activeUsers;
+const registerUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { name, email, password } = req.body;
+        // const existingUser = await findUserByEmail(email);
+        // if (existingUser) {
+        //   return res.status(400).json({ message: "User already exists" });
+        // }
+        // await createUser({ name, email, password }); // Create new user in the database
+        // const userToken = await createUserToken({
+        //   type: "verify-email",
+        //   email,
+        //   isUsed: false,
+        // });
+        // const newLink = `${process.env.CLIENT_BASE_URL}/verify-email/${userToken.id}`; // Generate verification link
+        // await sendEmail(
+        //   email, // Recipient email
+        //   `Confirm your email address for ${APP_NAME}`, // Email subject
+        //   verificationEmailHTML(name, newLink) // HTML email content
+        // );
+        res.status(201).json({ message: "User created successfully" }); // Send success response
+    }
+    catch (error) {
+        console.log("register error", error);
+        res.status(500).json({ message: "Internal server error" }); // Handle unexpected errors
+    }
+});
+exports.registerUser = registerUser;
+const logoutUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+        res.status(200).json({ message: "Logged out successfully" });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.logoutUser = logoutUser;
 // const allUsers: RequestHandler = async (req, res, next) => {
 //   try {
 //     const result = await userService.getAllUsers(req?.user?.name);
@@ -248,22 +291,3 @@ const activeUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
 //     next(err);
 //   }
 // };
-exports.default = {
-    // createUser,
-    // updateUser,
-    activeUsers,
-    // allUsers,
-    // usersWithDonationHistory,
-    // getSingleUser,
-    // getMyPost,
-    // getMyDonationHistory,
-    // makeConnection,
-    // makingConnection,
-    // connectedUsers,
-    // pointReduction,
-    // getRequestedDonor,
-    // changePassword,
-    // verifyOtp,
-    // resetPassword,
-    // updateLastSeen,
-};

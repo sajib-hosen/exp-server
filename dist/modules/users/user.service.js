@@ -8,41 +8,41 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const config_1 = __importDefault(require("../../config"));
-// import AppError from "../../errors/AppError";
-const emailService_1 = require("../../util/emailService");
+// import { BloodPost } from "../bloodPost/bloodPost.model";
+// import { DonorRequest } from "../donorRequest/donorRequest.model";
+// import { TUser } from "./user.interface";
 const user_model_1 = require("./user.model");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // import bcrypt from "bcrypt";
-const createUserRegistration = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const isUserAlreadyExist = yield user_model_1.User.findOne({ name: payload.name });
-    if (isUserAlreadyExist) {
-        throw new Error("User is already exists");
-    }
-    const result = yield user_model_1.User.create(payload);
-    if (!result) {
-        throw new Error("Failed to register new user");
-    }
-    // Generate email verification token
-    const token = jsonwebtoken_1.default.sign({ id: result._id }, config_1.default.jwt_access_secret, { expiresIn: "1h" });
-    const verificationLink = `${config_1.default.frontend_url}/verify-email?token=${token}`;
-    const html = `
-    <div style="font-family: sans-serif; text-align: center;">
-      <h3>Welcome to Blood Bank</h3>
-      <p>Please verify your email by clicking the link below:</p>
-      <a href="${verificationLink}" style="display: inline-block; padding: 12px 24px; background-color: #d62828; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">Verify Email</a>
-      </div>
-    `;
-    // Send the email
-    yield (0, emailService_1.sendVerificationEmail)(result.email, html);
-    return result;
-});
+// const createUserRegistration = async (payload: TUser) => {
+//   const isUserAlreadyExist = await User.findOne({ name: payload.name });
+//   if (isUserAlreadyExist) {
+//     throw new Error("User is already exists");
+//   }
+//   const result = await User.create(payload);
+//   if (!result) {
+//     throw new Error("Failed to register new user");
+//   }
+//   // Generate email verification token
+//   const token = jwt.sign(
+//     { id: result._id },
+//     config.jwt_access_secret as string,
+//     { expiresIn: "1h" }
+//   );
+//   const verificationLink = `${config.frontend_url}/verify-email?token=${token}`;
+//   const html = `
+//     <div style="font-family: sans-serif; text-align: center;">
+//       <h3>Welcome to Blood Bank</h3>
+//       <p>Please verify your email by clicking the link below:</p>
+//       <a href="${verificationLink}" style="display: inline-block; padding: 12px 24px; background-color: #d62828; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">Verify Email</a>
+//       </div>
+//     `;
+//   // Send the email
+//   await sendVerificationEmail(result.email, html);
+//   return result;
+// };
 const getAllActiveUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.find({ donationAvailability: true });
+    const result = yield user_model_1.User.find({});
     if (!result) {
         throw new Error("Failed to retrieve all active users");
     }
@@ -242,7 +242,7 @@ const getAllActiveUsers = () => __awaiter(void 0, void 0, void 0, function* () {
 //   return { message: "password reset successfully" };
 // };
 exports.default = {
-    createUserRegistration,
+    // createUserRegistration,
     // updateUserRegistration,
     getAllActiveUsers,
     // getAllUsersWithDonationHistory,

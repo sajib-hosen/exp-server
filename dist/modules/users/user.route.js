@@ -5,27 +5,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRouter = void 0;
 const express_1 = __importDefault(require("express"));
-const user_controller_1 = __importDefault(require("./user.controller"));
+const user_controller_1 = require("./user.controller");
+// import userController from "./user.controller";
 // import auth from "../../middlewares/auth";
 const router = express_1.default.Router();
-router.get("/active-users", user_controller_1.default.activeUsers);
-// router.get("/all-users", userController.allUsers);
+router.get("/active-users", user_controller_1.activeUsers);
+// router.post("/register", asyncHandler(registerUser));
+// router.post("/verify-email/:tokenId", asyncHandler(verifyEmail));
+// router.post("/login", asyncHandler(loginUser));
+// router.get("/me", asyncHandler(accessTokenGuard), asyncHandler(getMe));
+// router.post("/forgot-password", asyncHandler(forgotPassword));
+// router.post("/reset-password/:tokenId", asyncHandler(resetPassword));
 // router.get(
-//   "/users-with-donation-history",
-//   userController.usersWithDonationHistory
+//   "/refresh-token",
+//   asyncHandler(refreshTokenGuard),
+//   asyncHandler(refreshAccessToken)
 // );
-// router.get("/single-user/:id", userController.getSingleUser);
-// router.post("/user-registration", userController.createUser);
-// router.post("/forgot-password", auth(), userController.changePassword);
-// router.patch("/:id", userController.updateUser);
-// //router.patch("/make-connection", auth(), userController.makeConnection);
-// router.patch("/make-connection/:id", auth(), userController.makeConnection);
-// router.get("/my-posts", auth(), userController.getMyPost);
-// router.get("/requested-donor/:id", auth(), userController.getRequestedDonor);
-// router.get("/my-donation-history", auth(), userController.getMyDonationHistory);
-// router.get("/connected-users", auth(), userController.connectedUsers);
-// router.patch("/point-reduction/:name", auth(), userController.pointReduction);
-// router.post("/verify-otp", auth(), userController.verifyOtp);
-// router.post("/reset-password", auth(), userController.resetPassword);
+router.post("/logout", user_controller_1.logoutUser);
 // router.put("/update-last-seen", auth(), userController.updateLastSeen);
 exports.userRouter = router;
