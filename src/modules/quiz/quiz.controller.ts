@@ -114,30 +114,39 @@ export const submitQuizAnswers: RequestHandler = async (req, res, next) => {
 
 export const getCurrentStep: RequestHandler = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const user = (req as any).user;
 
-    const existingUser = await findUserByEmail(email);
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+    if (!user?.id && !user?.email) {
+      return res.status(400).json({ message: "Invalid user" });
     }
 
-    await createUser({ name, email, password }); // Create new user in the database
-
-    const userToken = await createUserToken({
-      type: "verify-email",
-      email,
-      isUsed: false,
+    const previousResult = await getQuizResult({
+      userId: user.id,
+      email: user.email,
     });
 
-    const newLink = `${process.env.CLIENT_BASE_URL}/verify-email/${userToken.id}`; // Generate verification link
+    if (!previousResult) {
+      // No previous result, start at step 1 and eligible
+      return res.status(200).json({
+        currentStep: 1,
+        eligibleToQuiz: true,
+        certification: null,
+      });
+    }
 
-    await sendEmail(
-      email, // Recipient email
-      `Confirm your email address for ${APP_NAME}`, // Email subject
-      verificationEmailHTML(name, newLink) // HTML email content
-    );
+    const currentStep =
+      previousResult.proceedToNextStep && previousResult.step < 3
+        ? previousResult.step + 1
+        : previousResult.step;
 
-    res.status(201).json({ message: "User created successfully" }); // Send success response
+    const eligibleToQuiz =
+      currentStep > previousResult.step || previousResult.step !== currentStep;
+
+    return res.status(200).json({
+      currentStep,
+      eligibleToQuiz,
+      certification: previousResult.certification,
+    });
   } catch (error) {
     console.log("register error", error);
     res.status(500).json({ message: "Internal server error" }); // Handle unexpected errors

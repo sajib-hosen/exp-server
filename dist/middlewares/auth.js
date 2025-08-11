@@ -74,6 +74,7 @@ function refreshTokenGuard(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
         const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.refreshToken;
+        console.log("token found");
         if (token) {
             try {
                 const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_REFRESH_SECRET);
@@ -108,7 +109,7 @@ function adminGuard(req, res, next) {
             const token = authHeader.split(" ")[1];
             try {
                 const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-                // console.log("admin guard", decoded);
+                console.log("admin guard", decoded);
                 if (!(decoded === null || decoded === void 0 ? void 0 : decoded.id) || decoded.role !== "admin") {
                     return res.status(401).json({ message: "User unauthorized!" });
                 }

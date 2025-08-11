@@ -42,8 +42,8 @@ app.use((req, res, next) => {
 
 // General rate limiter for all APIs
 const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  windowMs: 10 * 60 * 1000, // 15 minutes
+  max: 200,
   handler: (req, res, next) => {
     // Pass the error to your global error handler
     const error = new AppError(

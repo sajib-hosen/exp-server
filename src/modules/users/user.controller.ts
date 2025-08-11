@@ -125,6 +125,9 @@ export const loginUser: RequestHandler = async (req, res, next) => {
   try {
     const { email, password } = req.body; // Get credentials from request
     const user = await findUserByEmail(email); // Find user in DB
+
+    console.log("user ", user);
+
     if (!user || !password) {
       return res.status(401).json({ message: "Invalid credentials" });
     }

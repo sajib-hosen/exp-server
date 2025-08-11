@@ -129,6 +129,7 @@ const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     try {
         const { email, password } = req.body; // Get credentials from request
         const user = yield (0, user_service_1.findUserByEmail)(email); // Find user in DB
+        console.log("user ", user);
         if (!user || !password) {
             return res.status(401).json({ message: "Invalid credentials" });
         }
