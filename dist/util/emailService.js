@@ -12,21 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
-const app_1 = __importDefault(require("./app"));
-const config_1 = __importDefault(require("./config"));
-function main() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield mongoose_1.default.connect(config_1.default.database_url);
-            console.log("Database is connected successfully");
-            app_1.default.listen(config_1.default.port, () => {
-                console.log(`DB is connected`);
-            });
-        }
-        catch (err) {
-            console.log("Failed to connect database", err);
-        }
+exports.sendVerificationEmail = void 0;
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const sendVerificationEmail = (toEmail, htmlString) => __awaiter(void 0, void 0, void 0, function* () {
+    const transporter = nodemailer_1.default.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
     });
-}
-main();
+    yield transporter.sendMail({
+        from: `"Blood Bank" <${process.env.EMAIL_USER}>`,
+        to: toEmail,
+        subject: "Verify your email",
+        html: htmlString,
+    });
+});
+exports.sendVerificationEmail = sendVerificationEmail;

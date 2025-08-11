@@ -6,13 +6,11 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import AppError from "./errors/AppError";
+import config from "./config";
 
 const app: Application = express();
 
-const cors_sites = [
-  "http://localhost:3000",
-  "https://blood-bank-frontend-blue.vercel.app",
-];
+const cors_sites = [config.frontend_url as string];
 
 app.use(
   cors({
@@ -53,11 +51,6 @@ const generalLimiter = rateLimit({
 });
 app.use("/api/", generalLimiter);
 app.use("/api/", router);
-
-// app.use((req, res, next) => {
-//   console.log("Request Origin:", req.headers.origin);
-//   next();
-// });
 
 app.get("/", (req, res) => {
   console.log("Request Origin:", req.headers.origin);

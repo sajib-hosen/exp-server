@@ -6,22 +6,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const user_controller_1 = __importDefault(require("./user.controller"));
-const auth_1 = __importDefault(require("../../middlewares/auth"));
+// import auth from "../../middlewares/auth";
 const router = express_1.default.Router();
 router.get("/active-users", user_controller_1.default.activeUsers);
-router.get("/all-users", user_controller_1.default.allUsers);
-router.get("/users-with-donation-history", user_controller_1.default.usersWithDonationHistory);
-router.get("/single-user/:id", user_controller_1.default.getSingleUser);
-router.post("/user-registration", user_controller_1.default.createUser);
-router.patch("/:id", user_controller_1.default.updateUser);
-//router.patch("/make-connection", auth(), userController.makeConnection);
-router.patch("/make-connection/:id", (0, auth_1.default)(), user_controller_1.default.makeConnection);
-router.get("/my-posts", (0, auth_1.default)(), user_controller_1.default.getMyPost);
-router.get("/requested-donor/:id", (0, auth_1.default)(), user_controller_1.default.getRequestedDonor);
-router.get("/my-donation-history", (0, auth_1.default)(), user_controller_1.default.getMyDonationHistory);
-router.get("/connected-users", (0, auth_1.default)(), user_controller_1.default.connectedUsers);
-router.patch("/point-reduction/:name", (0, auth_1.default)(), user_controller_1.default.pointReduction);
-// router.get("/test", (req, res) => {
-//   res.json({ message: "Server is working" });
-// });
+// router.get("/all-users", userController.allUsers);
+// router.get(
+//   "/users-with-donation-history",
+//   userController.usersWithDonationHistory
+// );
+// router.get("/single-user/:id", userController.getSingleUser);
+// router.post("/user-registration", userController.createUser);
+// router.post("/forgot-password", auth(), userController.changePassword);
+// router.patch("/:id", userController.updateUser);
+// //router.patch("/make-connection", auth(), userController.makeConnection);
+// router.patch("/make-connection/:id", auth(), userController.makeConnection);
+// router.get("/my-posts", auth(), userController.getMyPost);
+// router.get("/requested-donor/:id", auth(), userController.getRequestedDonor);
+// router.get("/my-donation-history", auth(), userController.getMyDonationHistory);
+// router.get("/connected-users", auth(), userController.connectedUsers);
+// router.patch("/point-reduction/:name", auth(), userController.pointReduction);
+// router.post("/verify-otp", auth(), userController.verifyOtp);
+// router.post("/reset-password", auth(), userController.resetPassword);
+// router.put("/update-last-seen", auth(), userController.updateLastSeen);
 exports.userRouter = router;

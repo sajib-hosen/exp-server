@@ -26,6 +26,10 @@ const userSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
     password: {
         type: String,
         required: true,
@@ -57,6 +61,22 @@ const userSchema = new mongoose_1.Schema({
         min: 0,
         default: 2,
     },
+    refreshToken: {
+        type: String,
+        default: null,
+    },
+    otp: {
+        type: Number,
+        default: null,
+    },
+    otpExpiresAt: {
+        type: Date,
+        default: null,
+    },
+    lastSeenAt: {
+        type: Date,
+        default: Date.now,
+    },
     donationHistory: [
         {
             type: mongoose_1.Schema.Types.ObjectId,
@@ -82,7 +102,16 @@ const userSchema = new mongoose_1.Schema({
 userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = this;
-        user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
+        if (!user.isModified("password")) {
+            return next();
+        }
+        try {
+            user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
+            next();
+        }
+        catch (err) {
+            next(err);
+        }
     });
 });
 exports.User = (0, mongoose_1.model)("User", userSchema);

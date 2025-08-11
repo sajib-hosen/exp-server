@@ -12,43 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const AppError_1 = __importDefault(require("../../errors/AppError"));
-const bloodPost_model_1 = require("../bloodPost/bloodPost.model");
+const config_1 = __importDefault(require("../../config"));
+// import AppError from "../../errors/AppError";
+const emailService_1 = require("../../util/emailService");
 const user_model_1 = require("./user.model");
-const getAllActiveUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.find({ donationAvailability: true });
-    if (!result) {
-        throw new Error("Failed to retrieve all active users");
-    }
-    return result;
-});
-const getAllUsers = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const specificUser = yield user_model_1.User.find({ name: payload });
-    //console.log(specificUser[0]);
-    const allUsers = yield user_model_1.User.find();
-    const usersWithoutConnectors = allUsers.filter((user) => { var _a, _b; return !((_b = (_a = specificUser[0]) === null || _a === void 0 ? void 0 : _a.friends) === null || _b === void 0 ? void 0 : _b.includes(user === null || user === void 0 ? void 0 : user._id)); });
-    if (!usersWithoutConnectors) {
-        throw new Error("Failed to retrieve all users");
-    }
-    return usersWithoutConnectors;
-});
-const getAllUsersWithDonationHistory = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.find().populate({
-        path: "donationHistory",
-        strictPopulate: false,
-    });
-    if (!result) {
-        throw new Error("Failed to retrieve all active users");
-    }
-    return result;
-});
-const getSingleUser = (name) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.find({ name });
-    if (!result) {
-        throw new Error("Failed to retrieve single user");
-    }
-    return result;
-});
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+// import bcrypt from "bcrypt";
 const createUserRegistration = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isUserAlreadyExist = yield user_model_1.User.findOne({ name: payload.name });
     if (isUserAlreadyExist) {
@@ -58,99 +27,234 @@ const createUserRegistration = (payload) => __awaiter(void 0, void 0, void 0, fu
     if (!result) {
         throw new Error("Failed to register new user");
     }
+    // Generate email verification token
+    const token = jsonwebtoken_1.default.sign({ id: result._id }, config_1.default.jwt_access_secret, { expiresIn: "1h" });
+    const verificationLink = `${config_1.default.frontend_url}/verify-email?token=${token}`;
+    const html = `
+    <div style="font-family: sans-serif; text-align: center;">
+      <h3>Welcome to Blood Bank</h3>
+      <p>Please verify your email by clicking the link below:</p>
+      <a href="${verificationLink}" style="display: inline-block; padding: 12px 24px; background-color: #d62828; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">Verify Email</a>
+      </div>
+    `;
+    // Send the email
+    yield (0, emailService_1.sendVerificationEmail)(result.email, html);
     return result;
 });
-const updateUserRegistration = (id, user) => __awaiter(void 0, void 0, void 0, function* () {
-    // console.log(id, user);
-    const result = yield user_model_1.User.findByIdAndUpdate(id, user, {
-        new: true,
-        runValidators: true,
-    });
+const getAllActiveUsers = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.User.find({ donationAvailability: true });
     if (!result) {
-        throw new Error("Failed to update user profile");
+        throw new Error("Failed to retrieve all active users");
     }
     return result;
 });
-const getMyPost = (uName) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.findOne({ name: uName }).populate("postHistory");
-    if (!result) {
-        throw new Error("Failed to retrieved my posts");
-    }
-    return result;
-});
-const getRequestedDonor = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(id);
-    const result = yield bloodPost_model_1.BloodPost.findById(id).populate("donar");
-    if (!result) {
-        throw new Error("Failed to retrieved requested donor");
-    }
-    return result;
-});
-const getMyDonationHistory = (uName) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.findOne({ name: uName }).populate("donationHistory");
-    console.log(result);
-    if (!result) {
-        throw new Error("Failed to retrieved my posts");
-    }
-    return result;
-});
-const makeConnection = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.findOneAndUpdate({ name: payload.name }, {
-        $addToSet: { friends: payload.id },
-    }, {
-        new: true,
-        runValidators: true,
-    });
-    if (!result) {
-        throw new Error("Failed to create connection");
-    }
-    return result;
-});
-const connectedUsers = (name) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.find({ name: name }).populate("friends");
-    if (!result) {
-        throw new Error("Failed to find connected users");
-    }
-    return result;
-});
-const pointReduction = (name, postId, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.updateOne({ name: name, points: { $gte: 1 } }, {
-        $inc: { points: -1 },
-    }, {
-        new: true,
-        runValidators: true,
-    });
-    //console.log("result", result, id);
-    const numberOpened = {
-        user: userId,
-        phoneStatus: true,
-    };
-    const openMobileNumber = yield bloodPost_model_1.BloodPost.findByIdAndUpdate(postId, {
-        $push: { phoneNumberOpened: numberOpened },
-    }, {
-        new: true,
-        runValidators: true,
-    });
-    console.log(openMobileNumber);
-    if (!result) {
-        throw new Error("Failed to reduce points from user");
-    }
-    else if (result.modifiedCount === 0) {
-        throw new AppError_1.default(200, "You have 0 points");
-    }
-    return result;
-});
+// const getAllUsers = async (payload: string) => {
+//   const specificUser = await User.find({ name: payload });
+//   //console.log(specificUser[0]);
+//   const allUsers = await User.find();
+//   const usersWithoutConnectors = allUsers.filter(
+//     (user) => !specificUser[0]?.friends?.includes(user?._id)
+//   );
+//   if (!usersWithoutConnectors) {
+//     throw new Error("Failed to retrieve all users");
+//   }
+//   return usersWithoutConnectors;
+// };
+// const getAllUsersWithDonationHistory = async () => {
+//   const result = await User.find().populate({
+//     path: "donationHistory",
+//     strictPopulate: false,
+//   });
+//   if (!result) {
+//     throw new Error("Failed to retrieve all active users");
+//   }
+//   return result;
+// };
+// const getSingleUser = async (name: string) => {
+//   const result = await User.find({ name });
+//   if (!result) {
+//     throw new Error("Failed to retrieve single user");
+//   }
+//   return result;
+// };
+// const updateUserRegistration = async (id: string, user: Partial<TUser>) => {
+//   // console.log(id, user);
+//   const result = await User.findByIdAndUpdate(id, user, {
+//     new: true,
+//     runValidators: true,
+//   });
+//   if (!result) {
+//     throw new Error("Failed to update user profile");
+//   }
+//   return result;
+// };
+// const getMyPost = async (uName: string) => {
+//   const result = await User.findOne({ name: uName }).populate({
+//     path: "postHistory",
+//     populate: {
+//       path: "donarRequest",
+//       model: "DonorRequest",
+//     },
+//   });
+//   // const result = await User.findOne({ name: uName })
+//   //   .populate("postHistory")
+//   //   .populate("donorRequest");
+//   if (!result) {
+//     throw new Error("Failed to retrieved my posts");
+//   }
+//   return result;
+// };
+// const getRequestedDonor = async (id: string) => {
+//   //console.log(id);
+//   const result = await BloodPost.findById(id).populate({
+//     path: "donarRequest",
+//     populate: {
+//       path: "receiver",
+//       model: "User",
+//     },
+//   });
+//   if (!result) {
+//     throw new Error("Failed to retrieved requested donor");
+//   }
+//   return result;
+// };
+// const getMyDonationHistory = async (uName: string) => {
+//   const result = await User.findOne({ name: uName }).populate({
+//     path: "donationHistory",
+//     model: DonorRequest,
+//     populate: {
+//       path: "post",
+//       model: BloodPost,
+//     },
+//   });
+//   if (!result) {
+//     throw new Error("Failed to retrieved my posts");
+//   }
+//   return result;
+// };
+// const makeConnection = async (payload: { name: string; id: string }) => {
+//   const result = await User.findOneAndUpdate(
+//     { name: payload.name },
+//     {
+//       $addToSet: { friends: payload.id },
+//     },
+//     {
+//       new: true,
+//       runValidators: true,
+//     }
+//   );
+//   if (!result) {
+//     throw new Error("Failed to create connection");
+//   }
+//   return result;
+// };
+// const connectedUsers = async (name: string) => {
+//   const result = await User.find({ name: name }).populate("friends");
+//   //console.log("connected-user", result);
+//   if (!result) {
+//     throw new Error("Failed to find connected users");
+//   }
+//   return result;
+// };
+// const pointReduction = async (name: string, postId: string, userId: string) => {
+//   const result = await User.updateOne(
+//     { name: name, points: { $gte: 1 } },
+//     {
+//       $inc: { points: -1 },
+//     },
+//     {
+//       new: true,
+//       runValidators: true,
+//     }
+//   );
+//   //console.log("result", result, id);
+//   const numberOpened = {
+//     user: userId,
+//     phoneStatus: true,
+//   };
+//   const openMobileNumber = await BloodPost.findByIdAndUpdate(
+//     postId,
+//     {
+//       $push: { phoneNumberOpened: numberOpened },
+//     },
+//     {
+//       new: true,
+//       runValidators: true,
+//     }
+//   );
+//   //console.log(openMobileNumber);
+//   if (!result) {
+//     throw new Error("Failed to reduce points from user");
+//   } else if (result.modifiedCount === 0) {
+//     throw new AppError(200, "You have 0 points");
+//   }
+//   return result;
+// };
+// const changePassword = async (name: string) => {
+//   const user = await User.findOne({ name });
+//   if (!user) {
+//     throw new AppError(404, "User not found");
+//   }
+//   const code = Math.floor(100000 + Math.random() * 900000);
+//   user.otp = code;
+//   user.otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000) as Date; // 5 minutes
+//   await user.save();
+//   //const result = await sendEmail(user.email, "Your OTP Code", `Your OTP is: ${code}`);
+//   const html = `
+//     <div style="font-family: sans-serif; text-align: center;">
+//       <h1>Thanks for staying with Blood Bank</h1>
+//       <h3>Here is your OTP below:</h3>
+//       <h3>${code}</h3>
+//       </div>
+//     `;
+//   const result = await sendVerificationEmail(user.email, html);
+//   return result;
+// };
+// const verifyOtp = async (name: string, otp: string) => {
+//   const user = await User.findOne({ name });
+//   if (!user) {
+//     throw new AppError(404, "User not found");
+//   }
+//   if (
+//     Number(otp) !== user.otp ||
+//     new Date() > new Date(user.otpExpiresAt as Date)
+//   ) {
+//     throw new AppError(400, "OTP is invalid or expired");
+//   }
+//   return { message: "OTP verified" };
+// };
+// const resetPassword = async (name: string, otp: string, password: string) => {
+//   const user = await User.findOne({ name });
+//   console.log(otp, password);
+//   if (!user) {
+//     throw new AppError(404, "User not found");
+//   }
+//   if (
+//     Number(otp) !== user.otp ||
+//     new Date() > new Date(user.otpExpiresAt as Date)
+//   ) {
+//     throw new AppError(400, "OTP is invalid or expired");
+//   }
+//   user.password = password;
+//   user.otp = null;
+//   user.otpExpiresAt = null;
+//   await user.save();
+//   return { message: "password reset successfully" };
+// };
 exports.default = {
     createUserRegistration,
-    updateUserRegistration,
+    // updateUserRegistration,
     getAllActiveUsers,
-    getAllUsersWithDonationHistory,
-    getSingleUser,
-    getMyPost,
-    getMyDonationHistory,
-    getAllUsers,
-    makeConnection,
-    connectedUsers,
-    pointReduction,
-    getRequestedDonor,
+    // getAllUsersWithDonationHistory,
+    // getSingleUser,
+    // getMyPost,
+    // getMyDonationHistory,
+    // getAllUsers,
+    // makeConnection,
+    // connectedUsers,
+    // pointReduction,
+    // getRequestedDonor,
+    // changePassword,
+    // verifyOtp,
+    // resetPassword,
 };

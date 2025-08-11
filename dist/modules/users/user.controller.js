@@ -13,7 +13,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_service_1 = __importDefault(require("./user.service"));
-const sendResponse_1 = require("../../util/sendResponse");
+// import { sendResponse } from "../../util/sendResponse";
+// import { User } from "./user.model";
+// const createUser: RequestHandler = async (req, res, next) => {
+//   try {
+//     const { user } = req.body;
+//     //console.log("user from controller", user);
+//     const result = await userService.createUserRegistration(user);
+//     res.status(200).json({
+//       success: true,
+//       message: "User is registration request received successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     console.log("createUser Controller", err);
+//     next(err);
+//   }
+// };
 const activeUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield user_service_1.default.getAllActiveUsers();
@@ -27,197 +43,227 @@ const activeUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         next(err);
     }
 });
-const allUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    try {
-        const result = yield user_service_1.default.getAllUsers((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.name);
-        res.status(200).json({
-            success: true,
-            message: "Retrieved all users",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const usersWithDonationHistory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const result = yield user_service_1.default.getAllUsersWithDonationHistory();
-        res.status(200).json({
-            success: true,
-            message: "Retrieved all users with respective donation history",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const getSingleUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name } = req.params;
-    try {
-        const result = yield user_service_1.default.getSingleUser(name);
-        res.status(200).json({
-            success: true,
-            message: "Retrieved single user successfully",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { user } = req.body;
-        //console.log("user from controller", user);
-        const result = yield user_service_1.default.createUserRegistration(user);
-        res.status(200).json({
-            success: true,
-            message: "User is Registered successfully",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const result = yield user_service_1.default.updateUserRegistration(id, req.body);
-        (0, sendResponse_1.sendResponse)(res, {
-            success: true,
-            message: "User profile is updated successfully",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const getMyPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    try {
-        const result = yield user_service_1.default.getMyPost((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.name);
-        (0, sendResponse_1.sendResponse)(res, {
-            success: true,
-            message: "My posts are retrieved successfully",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const getRequestedDonor = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    try {
-        const result = yield user_service_1.default.getRequestedDonor(id);
-        (0, sendResponse_1.sendResponse)(res, {
-            success: true,
-            message: "Requested donors are retrieved successfully",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const getMyDonationHistory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    try {
-        const result = yield user_service_1.default.getMyDonationHistory((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.name);
-        (0, sendResponse_1.sendResponse)(res, {
-            success: true,
-            message: "My donation history are retrieved successfully",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const makeConnection = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    //console.log("cc", req.params);
-    const { id } = req === null || req === void 0 ? void 0 : req.params;
-    try {
-        const result = yield user_service_1.default.makeConnection({
-            id,
-            name: (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.name,
-        });
-        (0, sendResponse_1.sendResponse)(res, {
-            success: true,
-            message: "Connection created successfully",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const makingConnection = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    //console.log("cc", req.body);
-    try {
-        const result = yield user_service_1.default.makeConnection({
-            id: req === null || req === void 0 ? void 0 : req.body,
-            name: (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.name,
-        });
-        (0, sendResponse_1.sendResponse)(res, {
-            success: true,
-            message: "Connection created successfully",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const connectedUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    //console.log("cc", req.body);
-    try {
-        const result = yield user_service_1.default.connectedUsers((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.name);
-        (0, sendResponse_1.sendResponse)(res, {
-            success: true,
-            message: "Connected users are retrieved successfully",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
-const pointReduction = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    try {
-        const { postId, userId } = req.body;
-        const result = yield user_service_1.default.pointReduction((_a = req === null || req === void 0 ? void 0 : req.params) === null || _a === void 0 ? void 0 : _a.name, postId, userId);
-        (0, sendResponse_1.sendResponse)(res, {
-            success: true,
-            message: "User point reduced successfully",
-            data: result,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-});
+// const allUsers: RequestHandler = async (req, res, next) => {
+//   try {
+//     const result = await userService.getAllUsers(req?.user?.name);
+//     res.status(200).json({
+//       success: true,
+//       message: "Retrieved all users",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const usersWithDonationHistory: RequestHandler = async (req, res, next) => {
+//   try {
+//     const result = await userService.getAllUsersWithDonationHistory();
+//     res.status(200).json({
+//       success: true,
+//       message: "Retrieved all users with respective donation history",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const getSingleUser: RequestHandler = async (req, res, next) => {
+//   const { name } = req.params;
+//   try {
+//     const result = await userService.getSingleUser(name as string);
+//     res.status(200).json({
+//       success: true,
+//       message: "Retrieved single user successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const updateUser: RequestHandler = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const result = await userService.updateUserRegistration(id, req.body);
+//     sendResponse(res, {
+//       success: true,
+//       message: "User profile is updated successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const getMyPost: RequestHandler = async (req, res, next) => {
+//   try {
+//     const result = await userService.getMyPost(req?.user?.name);
+//     sendResponse(res, {
+//       success: true,
+//       message: "My posts are retrieved successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const getRequestedDonor: RequestHandler = async (req, res, next) => {
+//   const { id } = req.params;
+//   try {
+//     const result = await userService.getRequestedDonor(id);
+//     sendResponse(res, {
+//       success: true,
+//       message: "Requested donors are retrieved successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const getMyDonationHistory: RequestHandler = async (req, res, next) => {
+//   try {
+//     const result = await userService.getMyDonationHistory(req?.user?.name);
+//     sendResponse(res, {
+//       success: true,
+//       message: "My donation history are retrieved successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const makeConnection: RequestHandler = async (req, res, next) => {
+//   //console.log("cc", req.params);
+//   const { id } = req?.params;
+//   try {
+//     const result = await userService.makeConnection({
+//       id,
+//       name: req?.user?.name,
+//     });
+//     sendResponse(res, {
+//       success: true,
+//       message: "Connection created successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const makingConnection: RequestHandler = async (req, res, next) => {
+//   //console.log("cc", req.body);
+//   try {
+//     const result = await userService.makeConnection({
+//       id: req?.body,
+//       name: req?.user?.name,
+//     });
+//     sendResponse(res, {
+//       success: true,
+//       message: "Connection created successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const connectedUsers: RequestHandler = async (req, res, next) => {
+//   try {
+//     const result = await userService.connectedUsers(req?.user?.name);
+//     sendResponse(res, {
+//       success: true,
+//       message: "Connected users are retrieved successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const pointReduction: RequestHandler = async (req, res, next) => {
+//   try {
+//     const { postId, userId } = req.body;
+//     const result = await userService.pointReduction(
+//       req?.params?.name,
+//       postId,
+//       userId
+//     );
+//     sendResponse(res, {
+//       success: true,
+//       message: "User point reduced successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const changePassword: RequestHandler = async (req, res, next) => {
+//   try {
+//     const result = await userService.changePassword(req.user.name);
+//     sendResponse(res, {
+//       success: true,
+//       message: "OTP sent to email",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const verifyOtp: RequestHandler = async (req, res, next) => {
+//   try {
+//     const { otp } = req.query;
+//     const result = await userService.verifyOtp(req.user.name, otp as string);
+//     sendResponse(res, {
+//       success: true,
+//       message: "OTP verified",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const resetPassword: RequestHandler = async (req, res, next) => {
+//   try {
+//     const { otp, password } = req.body;
+//     const result = await userService.resetPassword(
+//       req.user.name,
+//       otp,
+//       password
+//     );
+//     sendResponse(res, {
+//       success: true,
+//       message: "Password reset successfully",
+//       data: result,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// const updateLastSeen: RequestHandler = async (req, res, next) => {
+//   try {
+//     await User.findByIdAndUpdate(req.user.id, {
+//       lastSeenAt: new Date(),
+//     });
+//     sendResponse(res, {
+//       success: true,
+//       message: null,
+//       data: null,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 exports.default = {
-    createUser,
-    updateUser,
+    // createUser,
+    // updateUser,
     activeUsers,
-    allUsers,
-    usersWithDonationHistory,
-    getSingleUser,
-    getMyPost,
-    getMyDonationHistory,
-    makeConnection,
-    makingConnection,
-    connectedUsers,
-    pointReduction,
-    getRequestedDonor,
+    // allUsers,
+    // usersWithDonationHistory,
+    // getSingleUser,
+    // getMyPost,
+    // getMyDonationHistory,
+    // makeConnection,
+    // makingConnection,
+    // connectedUsers,
+    // pointReduction,
+    // getRequestedDonor,
+    // changePassword,
+    // verifyOtp,
+    // resetPassword,
+    // updateLastSeen,
 };

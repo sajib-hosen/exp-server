@@ -22,7 +22,7 @@ const auth = () => {
         const token = req.headers.authorization;
         // ----------- checking whether token is sent or not -----------
         if (!token) {
-            throw new AppError_1.default(401, "You are not authorized");
+            throw new AppError_1.default(401, "you are not authorized");
         }
         jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret, function (err, decoded) {
             // ------- err --------
