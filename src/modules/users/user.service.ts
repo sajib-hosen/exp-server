@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import config from "../../config";
 // import AppError from "../../errors/AppError";
-import { sendVerificationEmail } from "../../util/emailService";
+// import { sendVerificationEmail } from "../../util/emailService";
 import { UserToken } from "./token.model";
 import { IUser, IUserToken } from "./user.interface";
 // import { BloodPost } from "../bloodPost/bloodPost.model";

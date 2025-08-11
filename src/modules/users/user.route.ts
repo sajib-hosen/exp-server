@@ -2,14 +2,14 @@ import express from "express";
 import {
   activeUsers,
   forgotPassword,
+  getMe,
   loginUser,
   logoutUser,
   registerUser,
   resetPassword,
   verifyEmail,
 } from "./user.controller";
-// import userController from "./user.controller";
-// import auth from "../../middlewares/auth";
+import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
@@ -21,7 +21,7 @@ router.post("/verify-email/:tokenId", verifyEmail);
 
 router.post("/login", loginUser);
 
-// router.get("/me", asyncHandler(accessTokenGuard), asyncHandler(getMe));
+router.get("/me", auth(), getMe);
 
 router.post("/forgot-password", forgotPassword);
 
@@ -34,7 +34,5 @@ router.post("/reset-password/:tokenId", resetPassword);
 // );
 
 router.post("/logout", logoutUser);
-
-// router.put("/update-last-seen", auth(), userController.updateLastSeen);
 
 export const userRouter = router;

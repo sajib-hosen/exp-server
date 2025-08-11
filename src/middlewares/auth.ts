@@ -17,7 +17,7 @@ const auth = () => {
 
     jwt.verify(
       token,
-      config.jwt_access_secret as string,
+      config.jwt.access_secret as string,
       function (err, decoded) {
         // ------- err --------
         if (err) {
