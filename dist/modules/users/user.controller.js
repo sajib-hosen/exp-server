@@ -31,6 +31,7 @@ const config_1 = __importDefault(require("../../config"));
 const send_email_1 = require("../../util/send-email");
 const constant_1 = require("../../util/constant");
 const verify_email_html_1 = require("../../util/verify-email-html");
+const reset_password_email_html_1 = require("../../util/reset-password-email-html");
 const activeUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, user_service_1.getAllActiveUsers)();
@@ -58,7 +59,7 @@ const registerUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             email,
             isUsed: false,
         });
-        const newLink = `${process.env.CLIENT_BASE_URL}/verify-email/${userToken.id}`; // Generate verification link
+        const newLink = `${config_1.default.frontend_url}/verify-email/${userToken.id}`; // Generate verification link
         yield (0, send_email_1.sendEmail)(email, // Recipient email
         `Confirm your email address for ${constant_1.APP_NAME}`, // Email subject
         (0, verify_email_html_1.verificationEmailHTML)(name, newLink) // HTML email content
@@ -75,7 +76,7 @@ const logoutUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     try {
         res.clearCookie("refreshToken", {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: config_1.default.node_env === "production",
             sameSite: "strict",
         });
         res.status(200).json({ message: "Logged out successfully" });
@@ -112,7 +113,7 @@ const verifyEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         // Set refresh token as HTTP-only cookie
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true, // Cannot be accessed via JavaScript
-            secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+            secure: config_1.default.node_env === "production", // Use HTTPS in production
             sameSite: "strict", // CSRF protection
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             path: "/",
@@ -146,7 +147,7 @@ const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
         //     // Set refresh token as HTTP-only cookie
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true, // Cannot be accessed via JavaScript
-            secure: process.env.NODE_ENV === "production", // HTTPS in production
+            secure: config_1.default.node_env === "production", // HTTPS in production
             sameSite: "strict", // CSRF protection
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             path: "/",
@@ -197,12 +198,8 @@ const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
             isUsed: false,
             expiresAt: expiry_stamp_1.EXPIRY_STAMP,
         });
-        const resetLink = `${process.env.CLIENT_BASE_URL}/reset-password/${resetToken.id}`;
-        //     await sendEmail(
-        //       email,
-        //       `Reset your password for ${APP_NAME}`,
-        //       resetPasswordEmailHTML(user.name, resetLink)
-        //     );
+        const resetLink = `${config_1.default.frontend_url}/reset-password/${resetToken.id}`;
+        yield (0, send_email_1.sendEmail)(email, `Reset your password for ${constant_1.APP_NAME}`, (0, reset_password_email_html_1.resetPasswordEmailHTML)(user.name, resetLink));
         res.status(200).json({
             message: "If a matching account exists, a reset link has been sent.",
         });
@@ -252,7 +249,7 @@ const refreshAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0,
         // Set new refresh token cookie
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: config_1.default.node_env === "production",
             sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });

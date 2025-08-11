@@ -17,6 +17,7 @@ import config from "../../config";
 import { sendEmail } from "../../util/send-email";
 import { APP_NAME } from "../../util/constant";
 import { verificationEmailHTML } from "../../util/verify-email-html";
+import { resetPasswordEmailHTML } from "../../util/reset-password-email-html";
 
 export const activeUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -49,7 +50,7 @@ export const registerUser: RequestHandler = async (req, res, next) => {
       isUsed: false,
     });
 
-    const newLink = `${process.env.CLIENT_BASE_URL}/verify-email/${userToken.id}`; // Generate verification link
+    const newLink = `${config.frontend_url}/verify-email/${userToken.id}`; // Generate verification link
 
     await sendEmail(
       email, // Recipient email
@@ -68,7 +69,7 @@ export const logoutUser: RequestHandler = async (req, res, next) => {
   try {
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: config.node_env === "production",
       sameSite: "strict",
     });
 
@@ -109,7 +110,7 @@ export const verifyEmail: RequestHandler = async (req, res, next) => {
     // Set refresh token as HTTP-only cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true, // Cannot be accessed via JavaScript
-      secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+      secure: config.node_env === "production", // Use HTTPS in production
       sameSite: "strict", // CSRF protection
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: "/",
@@ -143,7 +144,7 @@ export const loginUser: RequestHandler = async (req, res, next) => {
     //     // Set refresh token as HTTP-only cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true, // Cannot be accessed via JavaScript
-      secure: process.env.NODE_ENV === "production", // HTTPS in production
+      secure: config.node_env === "production", // HTTPS in production
       sameSite: "strict", // CSRF protection
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: "/",
@@ -192,13 +193,13 @@ export const forgotPassword: RequestHandler = async (req, res, next) => {
       isUsed: false,
       expiresAt: EXPIRY_STAMP,
     });
-    const resetLink = `${process.env.CLIENT_BASE_URL}/reset-password/${resetToken.id}`;
+    const resetLink = `${config.frontend_url}/reset-password/${resetToken.id}`;
 
-    //     await sendEmail(
-    //       email,
-    //       `Reset your password for ${APP_NAME}`,
-    //       resetPasswordEmailHTML(user.name, resetLink)
-    //     );
+    await sendEmail(
+      email,
+      `Reset your password for ${APP_NAME}`,
+      resetPasswordEmailHTML(user.name, resetLink)
+    );
     res.status(200).json({
       message: "If a matching account exists, a reset link has been sent.",
     });
@@ -249,7 +250,7 @@ export const refreshAccessToken: RequestHandler = async (req, res, next) => {
     // Set new refresh token cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: config.node_env === "production",
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });

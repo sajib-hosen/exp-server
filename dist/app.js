@@ -16,6 +16,7 @@ const app = (0, express_1.default)();
 const cors_sites = [
     config_1.default.frontend_url,
     "https://school-test-one.vercel.app",
+    "http://localhost:3000",
 ];
 app.use((0, cors_1.default)({
     origin: cors_sites,

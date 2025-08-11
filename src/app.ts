@@ -13,6 +13,7 @@ const app: Application = express();
 const cors_sites = [
   config.frontend_url as string,
   "https://school-test-one.vercel.app",
+  "http://localhost:3000",
 ];
 
 app.use(

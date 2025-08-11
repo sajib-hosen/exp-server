@@ -8,7 +8,7 @@ const express_1 = __importDefault(require("express"));
 const user_controller_1 = require("./user.controller");
 const auth_1 = require("../../middlewares/auth");
 const router = express_1.default.Router();
-router.get("/active-users", user_controller_1.activeUsers);
+// router.get("/active-users", activeUsers);
 router.post("/register", user_controller_1.registerUser);
 router.post("/verify-email/:tokenId", user_controller_1.verifyEmail);
 router.post("/login", user_controller_1.loginUser);

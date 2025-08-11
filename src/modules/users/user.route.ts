@@ -14,7 +14,7 @@ import { accessTokenGuard, refreshTokenGuard } from "../../middlewares/auth";
 
 const router = express.Router();
 
-router.get("/active-users", activeUsers);
+// router.get("/active-users", activeUsers);
 
 router.post("/register", registerUser);
 
