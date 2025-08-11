@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
+const constant_1 = require("../util/constant");
 dotenv_1.default.config({ path: path_1.default.join(process.cwd(), ".env") });
 exports.default = {
     node_env: process.env.NODE_ENV,
@@ -15,7 +16,7 @@ exports.default = {
         access_secret: process.env.JWT_ACCESS_SECRET,
         refresh_secret: process.env.JWT_REFRESH_SECRET,
     },
-    frontend_url: process.env.FRONTEND_URL,
+    frontend_url: process.env.FRONTEND_URL || constant_1.DEFAULT_CLIENT_URL,
     smtp: {
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,

@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import path from "path";
+import { DEFAULT_CLIENT_URL } from "../util/constant";
 
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 
@@ -14,7 +15,7 @@ export default {
     refresh_secret: process.env.JWT_REFRESH_SECRET,
   },
 
-  frontend_url: process.env.FRONTEND_URL,
+  frontend_url: process.env.FRONTEND_URL || DEFAULT_CLIENT_URL,
 
   smtp: {
     host: process.env.SMTP_HOST,
