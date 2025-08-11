@@ -1,3 +1,4 @@
+import adminRouter from "../modules/admin/admin.route";
 import { quizRouter } from "../modules/quiz/quiz.router";
 import { userRouter } from "../modules/users/user.route";
 import { Router } from "express";
@@ -12,6 +13,10 @@ const routers = [
   {
     path: "/quizzes",
     route: quizRouter,
+  },
+  {
+    path: "/admin",
+    route: adminRouter,
   },
 ];
 
